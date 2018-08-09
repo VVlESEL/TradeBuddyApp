@@ -11,3 +11,19 @@ build/
 pubspec.lock
 
 doc/api/
+
+key.properties
+GoogleService-Info.plist
+google-services.json
+
+vcs.xml
+
+.gradle
+local.properties
+.idea/libraries/Dart_Packages.xml
+.idea/libraries/Dart_SDK.xml
+.idea/libraries/Flutter_Plugins.xml
+.idea/workspace.xml
+.idea/libraries
+.idea
+*.iml
