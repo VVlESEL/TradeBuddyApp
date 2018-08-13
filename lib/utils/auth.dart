@@ -10,26 +10,6 @@ class Auth {
 
   static FirebaseUser user;
 
-  static Future<bool> googleSignIn() async {
-    bool isSingedIn = false;
-    GoogleSignInAccount googleSignInAccount = await googleSignin.signIn();
-    GoogleSignInAuthentication googleSignInAuthentication =
-        await googleSignInAccount.authentication;
-
-    await auth
-        .signInWithGoogle(
-            idToken: googleSignInAuthentication.idToken,
-            accessToken: googleSignInAuthentication.accessToken)
-        .then((user) {
-      print("Auth googleSignIn! User signed in: User id is: ${user.uid}");
-      isSingedIn = true;
-    }).catchError((error) {
-      print("Auth googleSignIn! Something went wrong! ${error.toString()}");
-    });
-
-    return isSingedIn;
-  }
-
   static Future<bool> emailSignIn(String email, String password) async {
     bool isSignedIn = false;
 

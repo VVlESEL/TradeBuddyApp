@@ -9,19 +9,9 @@ class Trades extends StatefulWidget {
 }
 
 class _TradesState extends State<Trades> {
-  final DatabaseReference reference =
-      FirebaseDatabase.instance.reference().child(Auth.user.uid);
-
-  @override
-  void initState() {
-    super.initState();
-    //init the database entry if it does not exist
-    reference.once().then((snapshot){
-      if(snapshot.value == null) {
-        reference.parent().set({Auth.user.uid: "init"});
-      }
-    });
-  }
+  final DatabaseReference reference = FirebaseDatabase.instance
+      .reference()
+      .child("user/${Auth.user.uid}/trades");
 
   @override
   Widget build(BuildContext context) {
@@ -55,38 +45,107 @@ class Trade extends StatelessWidget {
       sizeFactor: CurvedAnimation(parent: animation, curve: Curves.decelerate),
       child: Column(
         children: <Widget>[
-          ListTile(
-            trailing: Text(
-              snapshot.value["profit"],
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
-                color: double.parse(snapshot.value["profit"]) > 0
-                    ? Colors.blueAccent
-                    : Colors.redAccent,
-              ),
-            ),
-            title: Row(
+          ExpansionTile(
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(snapshot.value["symbol"], style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),),
+                Row(
+                  children: <Widget>[
+                    Text(
+                      snapshot.value["symbol"],
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      " ${snapshot.value["type"]} ${snapshot.value["lots"]}",
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        color: snapshot.value["type"].toString() == "buy"
+                            ? Colors.blueAccent
+                            : Colors.redAccent,
+                      ),
+                    ),
+                  ],
+                ),
+                Text("${snapshot.value["openprice"]} => ${snapshot
+                    .value["closeprice"]}"),
+              ],
+            ),
+            trailing: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Text(snapshot.value["closetime"]),
                 Text(
-                  ", ${snapshot.value["type"]} ${snapshot.value["lots"]}",
+                  snapshot.value["profit"],
                   style: TextStyle(
-                    fontSize: 12.0,
-                    color: snapshot.value["type"].toString() == "buy"
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                    color: double.parse(snapshot.value["profit"]) > 0
                         ? Colors.blueAccent
                         : Colors.redAccent,
                   ),
                 ),
               ],
             ),
-            subtitle: Text("${snapshot.value["openprice"]} => ${snapshot
-                .value["closeprice"]}"),
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Text("${snapshot.value["opentime"]}, "),
+                        Text(snapshot.value["commentary"]),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text("SL:"),
+                            Text("TP:"),
+                            Text("ID:"),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            Text(snapshot.value["stoploss"]),
+                            Text(snapshot.value["takeprofit"]),
+                            Text(snapshot.key),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text("Swap:"),
+                            Text("Commissions:"),
+                            Text(""),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            Text(snapshot.value["swap"]),
+                            Text(snapshot.value["commission"]),
+                            Text(""),
+                          ],
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              )
+            ],
           ),
-          Divider(height: 1.0,),
+          Divider(
+            height: 1.0,
+          ),
         ],
       ),
     );

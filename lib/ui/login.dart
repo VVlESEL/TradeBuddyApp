@@ -19,47 +19,35 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Login"),
-      ),
-      body: Center(
-        child: ListView(
-          shrinkWrap: true,
-          children: <Widget>[
-            Text(
-              "Put logo here",
-              textAlign: TextAlign.center,
+      body: ListView(
+        shrinkWrap: true,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 50.0),
+          ),
+          Image.asset(
+            "images/logo_bmtrading.png",
+            width: 120.0,
+            height: 120.0,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 50.0),
+          ),
+          ExpansionTile(
+            leading: Icon(
+              Icons.email,
+              size: 40.0,
             ),
-            ListTile(
-              onTap: () {
-                Auth.googleSignIn().then((b) {
-                  if (b)
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                            builder: (BuildContext context) => TradeBuddy()),
-                        (_) => false);
-                });
-              },
-              leading: Image.asset("images/icon_google.png"),
-              title: Text("Login with Google"),
-            ),
-            ExpansionTile(
-              leading: Icon(
-                Icons.email,
-                size: 40.0,
-              ),
-              title: Text("Login with E-Mail"),
-              children: <Widget>[
-                _formType == FormType.login
-                    ? _getLoginForm()
-                    : (_formType == FormType.register
-                        ? _getRegisterForm()
-                        : _getForgotForm())
-              ],
-            ),
-          ],
-        ),
+            title: Text("Login with E-Mail"),
+            children: <Widget>[
+              _formType == FormType.login
+                  ? _getLoginForm()
+                  : (_formType == FormType.register
+                      ? _getRegisterForm()
+                      : _getForgotForm())
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -67,8 +55,7 @@ class _LoginState extends State<Login> {
   Widget _getLoginForm() {
     return Form(
       key: _formKey,
-      child: ListView(
-        shrinkWrap: true,
+      child: Column(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.only(top: 3.0),
@@ -125,8 +112,7 @@ class _LoginState extends State<Login> {
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  TradeBuddy()),
+                              builder: (BuildContext context) => TradeBuddy()),
                           (_) => false);
                   });
                 }
@@ -161,8 +147,7 @@ class _LoginState extends State<Login> {
   Widget _getRegisterForm() {
     return Form(
       key: _formKey,
-      child: ListView(
-        shrinkWrap: true,
+      child: Column(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.only(top: 3.0),
@@ -243,8 +228,7 @@ class _LoginState extends State<Login> {
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  TradeBuddy()),
+                              builder: (BuildContext context) => TradeBuddy()),
                           (_) => false);
                   });
                 }
@@ -279,8 +263,7 @@ class _LoginState extends State<Login> {
   Widget _getForgotForm() {
     return Form(
       key: _formKey,
-      child: ListView(
-        shrinkWrap: true,
+      child: Column(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.only(top: 3.0),

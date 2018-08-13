@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:trade_buddy/ui/analytics.dart';
 import 'package:trade_buddy/ui/login.dart';
 import 'package:trade_buddy/ui/settings.dart';
@@ -30,6 +31,13 @@ class _TradeBuddyState extends State<TradeBuddy> {
 
     Auth.checkSignIn().then((b) {
       setState(() {
+        //enable offline caching
+        FirebaseDatabase.instance.setPersistenceEnabled(true);
+        FirebaseDatabase.instance
+            .reference()
+            .child("user/${Auth.user.uid}/trades")
+            .keepSynced(true);
+
         _isSignedIn = b;
         _isLoaded = true;
       });
