@@ -24,7 +24,7 @@ class _TradesState extends State<Trades> {
           .compareTo(a.value["closetime"].toString()),
       itemBuilder: (BuildContext context, DataSnapshot snapshot,
           Animation<double> animation, int pos) {
-        return Trade(
+        return TradeTile(
           snapshot: snapshot,
           animation: animation,
         );
@@ -33,11 +33,11 @@ class _TradesState extends State<Trades> {
   }
 }
 
-class Trade extends StatelessWidget {
+class TradeTile extends StatelessWidget {
   final DataSnapshot snapshot;
   final Animation animation;
 
-  Trade({this.snapshot, this.animation});
+  TradeTile({this.snapshot, this.animation});
 
   @override
   Widget build(BuildContext context) {
