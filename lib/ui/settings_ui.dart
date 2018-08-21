@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:trade_buddy/ui/login.dart';
+import 'package:trade_buddy/ui/login_ui.dart';
 import 'package:trade_buddy/utils/auth.dart';
 
 class Settings extends StatefulWidget {

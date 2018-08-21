@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:trade_buddy/analytics/analytics_ui.dart';
-import 'package:trade_buddy/ui/login.dart';
-import 'package:trade_buddy/ui/settings.dart';
-import 'package:trade_buddy/ui/trades.dart';
+import 'package:trade_buddy/ui/analytics_ui.dart';
+import 'package:trade_buddy/ui/login_ui.dart';
+import 'package:trade_buddy/ui/settings_ui.dart';
+import 'package:trade_buddy/ui/trades_ui.dart';
 import 'package:trade_buddy/utils/auth.dart';
+import 'package:trade_buddy/utils/trades_controller.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -29,7 +30,11 @@ class _TradeBuddyState extends State<TradeBuddy> {
   void initState() {
     super.initState();
 
-    Auth.checkSignIn().then((b) {
+    Auth.checkSignIn().then((b) async {
+      //get all the trades from the db and store them in the db
+      await TradesController.initialize();
+
+      //inform the ui that data is loaded
       setState(() {
         _isSignedIn = b;
         _isLoaded = true;
@@ -37,7 +42,7 @@ class _TradeBuddyState extends State<TradeBuddy> {
 
       //enable offline caching
       FirebaseDatabase.instance.setPersistenceEnabled(true);
-      if(b) {
+      if (b) {
         FirebaseDatabase.instance
             .reference()
             .child("user/${Auth.user.uid}/trades")

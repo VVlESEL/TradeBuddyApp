@@ -1,7 +1,7 @@
+import 'dart:collection';
 import 'package:flutter/material.dart';
-import 'package:trade_buddy/utils/auth.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:trade_buddy/utils/trade_model.dart';
+import 'package:trade_buddy/utils/trades_controller.dart';
 
 class Trades extends StatefulWidget {
   @override
@@ -9,40 +9,38 @@ class Trades extends StatefulWidget {
 }
 
 class _TradesState extends State<Trades> {
-  final DatabaseReference reference = FirebaseDatabase.instance
-      .reference()
-      .child("user/${Auth.user.uid}/trades");
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: FirebaseAnimatedList(
-      query: reference,
-      padding: const EdgeInsets.all(8.0),
-      sort: (a, b) => b.value["closetime"]
-          .toString()
-          .compareTo(a.value["closetime"].toString()),
-      itemBuilder: (BuildContext context, DataSnapshot snapshot,
-          Animation<double> animation, int pos) {
-        return TradeTile(
-          snapshot: snapshot,
-          animation: animation,
-        );
-      },
-    ));
+    return StreamBuilder<UnmodifiableListView<Trade>>(
+      stream: TradesController.tradesStream,
+      initialData: UnmodifiableListView<Trade>([]),
+      builder: (context, snapshot) => ListView(
+            children: snapshot.data
+                .map((trade) => TradeTile(
+                      trade: trade,
+                    ))
+                .toList(),
+          ),
+    );
   }
 }
 
-class TradeTile extends StatelessWidget {
-  final DataSnapshot snapshot;
-  final Animation animation;
+class TradeTile extends StatefulWidget {
+  final Trade trade;
 
-  TradeTile({this.snapshot, this.animation});
+  TradeTile({this.trade});
 
+  @override
+  _TradeTileState createState() => _TradeTileState();
+}
+
+class _TradeTileState extends State<TradeTile>
+    with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return SizeTransition(
-      sizeFactor: CurvedAnimation(parent: animation, curve: Curves.decelerate),
+      sizeFactor: CurvedAnimation(
+          parent: AnimationController(duration: Duration(milliseconds: 500), vsync: this)..forward(), curve: Curves.decelerate),
       child: Column(
         children: <Widget>[
           ExpansionTile(
@@ -52,37 +50,36 @@ class TradeTile extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     Text(
-                      snapshot.value["symbol"],
+                      widget.trade.symbol,
                       style: TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      " ${snapshot.value["type"]} ${snapshot.value["lots"]}",
+                      " ${widget.trade.type} ${widget.trade.lots}",
                       style: TextStyle(
                         fontSize: 12.0,
-                        color: snapshot.value["type"].toString() == "buy"
+                        color: widget.trade.type.toString() == "buy"
                             ? Colors.blueAccent
                             : Colors.redAccent,
                       ),
                     ),
                   ],
                 ),
-                Text("${snapshot.value["openprice"]} => ${snapshot
-                    .value["closeprice"]}"),
+                Text("${widget.trade.openprice} => ${widget.trade.closeprice}"),
               ],
             ),
             trailing: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Text(snapshot.value["closetime"]),
+                Text(widget.trade.closetime),
                 Text(
-                  snapshot.value["profit"],
+                  "${widget.trade.profit}",
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
-                    color: double.parse(snapshot.value["profit"]) > 0
+                    color: widget.trade.profit > 0
                         ? Colors.blueAccent
                         : Colors.redAccent,
                   ),
@@ -97,8 +94,8 @@ class TradeTile extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
-                        Text("${snapshot.value["opentime"]}, "),
-                        Text(snapshot.value["commentary"]),
+                        Text("${widget.trade.opentime}, "),
+                        Text(widget.trade.commentary),
                       ],
                     ),
                     Row(
@@ -115,9 +112,9 @@ class TradeTile extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: <Widget>[
-                            Text(snapshot.value["stoploss"]),
-                            Text(snapshot.value["takeprofit"]),
-                            Text(snapshot.key),
+                            Text("${widget.trade.stoploss}"),
+                            Text("${widget.trade.takeprofit}"),
+                            Text("${widget.trade.id}"),
                           ],
                         ),
                         Column(
@@ -131,8 +128,8 @@ class TradeTile extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: <Widget>[
-                            Text(snapshot.value["swap"]),
-                            Text(snapshot.value["commission"]),
+                            Text("${widget.trade.swap}"),
+                            Text("${widget.trade.commission}"),
                             Text(""),
                           ],
                         ),
