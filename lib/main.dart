@@ -5,7 +5,11 @@ import 'package:trade_buddy/ui/login_ui.dart';
 import 'package:trade_buddy/ui/settings_ui.dart';
 import 'package:trade_buddy/ui/trades_ui.dart';
 import 'package:trade_buddy/utils/auth.dart';
+import 'package:trade_buddy/utils/settings_controller.dart';
 import 'package:trade_buddy/utils/trades_controller.dart';
+
+bool _isLoaded = false;
+bool _isSignedIn = false;
 
 void main() {
   runApp(MaterialApp(
@@ -22,8 +26,6 @@ class TradeBuddy extends StatefulWidget {
 }
 
 class _TradeBuddyState extends State<TradeBuddy> {
-  bool _isLoaded = false;
-  bool _isSignedIn = false;
   int _menuIndex = 0;
 
   @override
@@ -32,7 +34,10 @@ class _TradeBuddyState extends State<TradeBuddy> {
 
     Auth.checkSignIn().then((b) async {
       //get all the trades from the db and store them in the db
-      await TradesController.initialize();
+      if(b) {
+        await TradesController.initialize();
+        await SettingsController.initialize();
+      }
 
       //inform the ui that data is loaded
       setState(() {

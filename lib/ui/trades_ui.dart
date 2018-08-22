@@ -34,13 +34,28 @@ class TradeTile extends StatefulWidget {
   _TradeTileState createState() => _TradeTileState();
 }
 
-class _TradeTileState extends State<TradeTile>
-    with TickerProviderStateMixin {
+class _TradeTileState extends State<TradeTile> with TickerProviderStateMixin {
+  AnimationController animationController;
+
+  @override
+  void dispose() {
+    animationController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500))
+          ..forward();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizeTransition(
       sizeFactor: CurvedAnimation(
-          parent: AnimationController(duration: Duration(milliseconds: 500), vsync: this)..forward(), curve: Curves.decelerate),
+          parent: animationController, curve: Curves.decelerate),
       child: Column(
         children: <Widget>[
           ExpansionTile(
@@ -121,7 +136,7 @@ class _TradeTileState extends State<TradeTile>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text("Swap:"),
-                            Text("Commissions:"),
+                            Text("Commission:"),
                             Text(""),
                           ],
                         ),

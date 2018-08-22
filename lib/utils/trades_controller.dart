@@ -17,6 +17,9 @@ class TradesController {
 
   ///The function initializes the controller
   static Future<void> initialize() async {
+    //reset trades list
+    trades.clear();
+
     //add a listener for new child and check if it meets the filter criteria
     reference.onChildAdded.listen((event) {
       if(addTrade(Trade.fromJson(event.snapshot.key, event.snapshot.value))) {
