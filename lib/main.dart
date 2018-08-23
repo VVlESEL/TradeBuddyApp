@@ -5,13 +5,19 @@ import 'package:trade_buddy/ui/login_ui.dart';
 import 'package:trade_buddy/ui/settings_ui.dart';
 import 'package:trade_buddy/ui/trades_ui.dart';
 import 'package:trade_buddy/utils/auth.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:trade_buddy/utils/settings_controller.dart';
 import 'package:trade_buddy/utils/trades_controller.dart';
+import 'package:trade_buddy/utils/admob.dart';
+import 'dart:async';
 
 bool _isLoaded = false;
 bool _isSignedIn = false;
 
 void main() {
+  FirebaseAdMob.instance
+      .initialize(appId: "ca-app-pub-4539817448561450~4872351601");
+
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     title: "Trade Buddy",
@@ -25,35 +31,62 @@ class TradeBuddy extends StatefulWidget {
   _TradeBuddyState createState() => _TradeBuddyState();
 }
 
-class _TradeBuddyState extends State<TradeBuddy> {
+class _TradeBuddyState extends State<TradeBuddy>
+    with SingleTickerProviderStateMixin {
+  AnimationController _animationController;
+  Timer _animationTimer;
+  BannerAd _bannerAd;
   int _menuIndex = 0;
+
+  @override
+  void dispose() {
+    _animationTimer?.cancel();
+    _bannerAd?.dispose();
+    _animationController?.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
 
-    Auth.checkSignIn().then((b) async {
-      //get all the trades from the db and store them in the db
-      if(b) {
-        await SettingsController.initialize();
-        await TradesController.initialize();
-      }
+    _animationController = AnimationController(
+      duration: Duration(milliseconds: 750),
+      vsync: this,
+    );
 
-      //inform the ui that data is loaded
-      setState(() {
-        _isSignedIn = b;
-        _isLoaded = true;
+    _animationTimer = Timer.periodic(
+      Duration(seconds: 20),
+      (Timer t) async {
+        await _animationController.forward().orCancel;
+        await _animationController.reverse().orCancel;
+      },
+    );
+
+    if (!_isLoaded) {
+      Auth.checkSignIn().then((b) async {
+        //get all the trades from the db and store them in the db
+        if (b) {
+          await SettingsController.initialize();
+          await TradesController.initialize();
+        }
+
+        //inform the ui that data is loaded
+        setState(() {
+          _isSignedIn = b;
+          _isLoaded = true;
+        });
+
+        //enable offline caching
+        FirebaseDatabase.instance.setPersistenceEnabled(true);
+        if (b) {
+          FirebaseDatabase.instance
+              .reference()
+              .child("user/${Auth.user.uid}/trades")
+              .keepSynced(true);
+        }
       });
-
-      //enable offline caching
-      FirebaseDatabase.instance.setPersistenceEnabled(true);
-      if (b) {
-        FirebaseDatabase.instance
-            .reference()
-            .child("user/${Auth.user.uid}/trades")
-            .keepSynced(true);
-      }
-    });
+    }
   }
 
   @override
@@ -65,6 +98,19 @@ class _TradeBuddyState extends State<TradeBuddy> {
             : Scaffold(
                 appBar: AppBar(
                   title: Text("Trade Buddy"),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: AnimatedStar(
+                        controller: _animationController,
+                      ),
+                      onPressed: () => createInterstitialAd()
+                        ..load()
+                        ..show(
+                          anchorType: AnchorType.top,
+                          anchorOffset: 100.0,
+                        ),
+                    )
+                  ],
                 ),
                 body: _getBody(),
                 bottomNavigationBar: BottomNavigationBar(
@@ -96,13 +142,70 @@ class _TradeBuddyState extends State<TradeBuddy> {
   Widget _getBody() {
     switch (_menuIndex) {
       case 0:
+        _bannerAd ??= createBannerAd()
+          ..load()
+          ..show(
+            anchorType: AnchorType.bottom,
+            anchorOffset: 60.0,
+          );
         return Trades();
       case 1:
+        _bannerAd?.dispose();
+        _bannerAd = null;
         return Analytics();
       case 2:
+        _bannerAd ??= createBannerAd()
+          ..load()
+          ..show(
+            anchorType: AnchorType.bottom,
+            anchorOffset: 60.0,
+          );
         return Settings();
       default:
         return Container();
     }
+  }
+}
+
+class AnimatedStar extends StatelessWidget {
+  final Animation<double> controller;
+  final Animation<Color> color;
+  final Animation<double> rotate;
+  final Animation<double> size;
+
+  AnimatedStar({Key key, this.controller})
+      : size = Tween<double>(
+          begin: 40.0,
+          end: 50.0,
+        ).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: Interval(0.0, 1.0),
+          ),
+        ),
+        color = ColorTween(
+          begin: Colors.white,
+          end: Colors.yellow[900],
+        ).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: Interval(0.0, 1.0),
+          ),
+        );
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (BuildContext context, Widget child) {
+        return Container(
+          child: Icon(
+            Icons.star,
+            color: color.value,
+            size: size.value,
+          ),
+        );
+      },
+    );
   }
 }

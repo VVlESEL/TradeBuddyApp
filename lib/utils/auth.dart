@@ -1,12 +1,10 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'dart:async';
 
 class Auth {
   static final FirebaseAuth auth = FirebaseAuth.instance;
   static final GoogleSignIn googleSignin = GoogleSignIn();
-  static final FirebaseAnalytics analytics = FirebaseAnalytics();
 
   static FirebaseUser user;
 
@@ -47,7 +45,6 @@ class Auth {
 
     if (user != null) {
       print("Auth checkSignIn! uid: ${user.uid} email: ${user.email}");
-      analytics.logLogin();
       return true;
     } else {
       print("Auth checkSignIn! User is NOT signed in");
