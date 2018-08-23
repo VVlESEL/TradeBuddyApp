@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'dart:collection';
 import 'package:rxdart/rxdart.dart';
+import 'package:trade_buddy/utils/settings_controller.dart';
 import 'package:trade_buddy/utils/trade_model.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:trade_buddy/utils/auth.dart';
 
 class TradesController {
-  //get a reference to the trades db entry of the user
-  static final DatabaseReference reference= FirebaseDatabase.instance
-      .reference()
-      .child("user/${Auth.user.uid}/trades");
+  static DatabaseReference reference;
   static final List<Trade> trades = List();
   static final _tradesSubject = BehaviorSubject<UnmodifiableListView<Trade>>();
 
@@ -17,18 +15,22 @@ class TradesController {
 
   ///The function initializes the controller
   static Future<void> initialize() async {
+    reference = FirebaseDatabase.instance.reference().child(
+        "user/${Auth.user.uid}/trades/${SettingsController.currentAccount}");
+
     //reset trades list
     trades.clear();
 
     //add a listener for new child and check if it meets the filter criteria
     reference.onChildAdded.listen((event) {
-      if(addTrade(Trade.fromJson(event.snapshot.key, event.snapshot.value))) {
+      if (addTrade(Trade.fromJson(event.snapshot.key, event.snapshot.value))) {
         _tradesSubject.add(UnmodifiableListView(trades));
       }
     });
 
     reference.onChildRemoved.listen((event) {
-      trades.removeWhere((trade) => trade.id == int.tryParse(event.snapshot.key) ?? 0);
+      trades.removeWhere(
+          (trade) => trade.id == int.tryParse(event.snapshot.key) ?? 0);
       _tradesSubject.add(UnmodifiableListView(trades));
     });
   }
@@ -54,5 +56,5 @@ class TradesController {
   }
 
   ///The function checks if a trade meets the filter criteria
-  //bool checkTrade(Trade trade){ ... }
+//bool checkTrade(Trade trade){ ... }
 }

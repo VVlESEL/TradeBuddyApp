@@ -1,41 +1,33 @@
 class Trade {
-  int _id;
+  num _id;
   String _symbol;
-  double _lots;
+  num _lots;
   String _type;
-  double _openprice;
+  num _openprice;
   String _opentime;
-  double _closeprice;
+  num _closeprice;
   String _closetime;
-  double _commission;
-  double _swap;
-  double _profit;
-  double _takeprofit;
-  double _stoploss;
+  num _commission;
+  num _swap;
+  num _profit;
+  num _takeprofit;
+  num _stoploss;
   String _commentary;
 
   Trade.fromJson(String id, Map data) {
     this.id = int.tryParse(id) ?? 0;
     this.symbol = data["symbol"];
-    this.lots = double.parse(data["lots"]);
+    this.lots = data["lots"];
     this.type = data["type"];
-    this.openprice = double.tryParse(data["openprice"]) ??
-        int.tryParse(data["openprice"]) ??
-        0.0;
+    this.openprice = data["openprice"];
     this.opentime = data["opentime"];
-    this.closeprice = double.tryParse(data["closeprice"]) ??
-        int.tryParse(data["closeprice"]) ??
-        0.0;
+    this.closeprice = data["closeprice"];
     this.closetime = data["closetime"];
-    this.commission = double.tryParse(data["commission"]) ?? 0.0;
-    this.swap = double.tryParse(data["swap"]) ?? 0.0;
-    this.profit = double.tryParse(data["profit"]) ?? 0.0;
-    this.takeprofit = double.tryParse(data["takeprofit"]) ??
-        int.tryParse(data["takeprofit"]) ??
-        0.0;
-    this.stoploss = double.tryParse(data["stoploss"]) ??
-        int.tryParse(data["stoploss"]) ??
-        0.0;
+    this.commission = data["commission"];
+    this.swap = data["swap"];
+    this.profit = data["profit"];
+    this.takeprofit = data["takeprofit"];
+    this.stoploss = data["stoploss"];
     this.commentary = data["commentary"];
   }
 
@@ -56,55 +48,55 @@ class Trade {
 
   set commentary(String value) => _commentary = value;
 
-  double get stoploss => _stoploss;
+  num get stoploss => _stoploss;
 
-  set stoploss(double value) => _stoploss = value;
+  set stoploss(num value) => _stoploss = value;
 
-  double get takeprofit => _takeprofit;
+  num get takeprofit => _takeprofit;
 
-  set takeprofit(double value) => _takeprofit = value;
+  set takeprofit(num value) => _takeprofit = value;
 
-  double get profit => _profit;
+  num get profit => _profit;
 
-  set profit(double value) => _profit = value;
+  set profit(num value) => _profit = value;
 
-  double get swap => _swap;
+  num get swap => _swap;
 
-  set swap(double value) => _swap = value;
+  set swap(num value) => _swap = value;
 
-  double get commission => _commission;
+  num get commission => _commission;
 
-  set commission(double value) => _commission = value;
+  set commission(num value) => _commission = value;
 
   String get closetime => _closetime;
 
   set closetime(String value) => _closetime = value;
 
-  double get closeprice => _closeprice;
+  num get closeprice => _closeprice;
 
-  set closeprice(double value) => _closeprice = value;
+  set closeprice(num value) => _closeprice = value;
 
   String get opentime => _opentime;
 
   set opentime(String value) => _opentime = value;
 
-  double get openprice => _openprice;
+  num get openprice => _openprice;
 
-  set openprice(double value) => _openprice = value;
+  set openprice(num value) => _openprice = value;
 
   String get type => _type;
 
   set type(String value) => _type = value;
 
-  double get lots => _lots;
+  num get lots => _lots;
 
-  set lots(double value) => _lots = value;
+  set lots(num value) => _lots = value;
 
   String get symbol => _symbol;
 
   set symbol(String value) => _symbol = value;
 
-  int get id => _id;
+  num get id => _id;
 
-  set id(int value) => _id = value;
+  set id(num value) => _id = value;
 }

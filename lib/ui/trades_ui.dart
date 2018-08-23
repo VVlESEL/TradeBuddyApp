@@ -34,132 +34,112 @@ class TradeTile extends StatefulWidget {
   _TradeTileState createState() => _TradeTileState();
 }
 
-class _TradeTileState extends State<TradeTile> with TickerProviderStateMixin {
-  AnimationController animationController;
-
-  @override
-  void dispose() {
-    animationController?.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 500))
-          ..forward();
-  }
-
+class _TradeTileState extends State<TradeTile> {
   @override
   Widget build(BuildContext context) {
-    return SizeTransition(
-      sizeFactor: CurvedAnimation(
-          parent: animationController, curve: Curves.decelerate),
-      child: Column(
-        children: <Widget>[
-          ExpansionTile(
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Text(
-                      widget.trade.symbol,
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      " ${widget.trade.type} ${widget.trade.lots}",
-                      style: TextStyle(
-                        fontSize: 12.0,
-                        color: widget.trade.type.toString() == "buy"
-                            ? Colors.blueAccent
-                            : Colors.redAccent,
-                      ),
-                    ),
-                  ],
-                ),
-                Text("${widget.trade.openprice} => ${widget.trade.closeprice}"),
-              ],
-            ),
-            trailing: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                Text(widget.trade.closetime),
-                Text(
-                  "${widget.trade.profit}",
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                    color: widget.trade.profit > 0
-                        ? Colors.blueAccent
-                        : Colors.redAccent,
-                  ),
-                ),
-              ],
-            ),
+    return Column(
+      children: <Widget>[
+        ExpansionTile(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Text("${widget.trade.opentime}, "),
-                        Text(widget.trade.commentary),
-                      ],
+              Row(
+                children: <Widget>[
+                  Text(
+                    widget.trade.symbol,
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text("SL:"),
-                            Text("TP:"),
-                            Text("ID:"),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            Text("${widget.trade.stoploss}"),
-                            Text("${widget.trade.takeprofit}"),
-                            Text("${widget.trade.id}"),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text("Swap:"),
-                            Text("Commission:"),
-                            Text(""),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            Text("${widget.trade.swap}"),
-                            Text("${widget.trade.commission}"),
-                            Text(""),
-                          ],
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              )
+                  ),
+                  Text(
+                    " ${widget.trade.type} ${widget.trade.lots}",
+                    style: TextStyle(
+                      fontSize: 12.0,
+                      color: widget.trade.type.toString() == "buy"
+                          ? Colors.blueAccent
+                          : Colors.redAccent,
+                    ),
+                  ),
+                ],
+              ),
+              Text("${widget.trade.openprice} => ${widget.trade.closeprice}"),
             ],
           ),
-          Divider(
-            height: 1.0,
+          trailing: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              Text(widget.trade.closetime),
+              Text(
+                "${widget.trade.profit}",
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                  color: widget.trade.profit > 0
+                      ? Colors.blueAccent
+                      : Colors.redAccent,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Text("${widget.trade.opentime}, "),
+                      Text(widget.trade.commentary),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text("SL:"),
+                          Text("TP:"),
+                          Text("ID:"),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Text("${widget.trade.stoploss}"),
+                          Text("${widget.trade.takeprofit}"),
+                          Text("${widget.trade.id}"),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text("Swap:"),
+                          Text("Commission:"),
+                          Text(""),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Text("${widget.trade.swap}"),
+                          Text("${widget.trade.commission}"),
+                          Text(""),
+                        ],
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+        Divider(
+          height: 1.0,
+        ),
+      ],
     );
   }
 }

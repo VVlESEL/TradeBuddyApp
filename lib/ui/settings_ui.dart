@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trade_buddy/ui/accounts_ui.dart';
 import 'package:trade_buddy/ui/login_ui.dart';
 import 'package:trade_buddy/utils/auth.dart';
 
@@ -13,8 +14,19 @@ class _SettingsState extends State<Settings> {
     return ListView(
       children: <Widget>[
         ListTile(
+          leading: Icon(Icons.format_list_numbered),
+          title: Text("Accounts"),
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => Accounts()));
+          },
+        ),
+        Divider(height: 1.0),
+        ListTile(
           leading: Icon(Icons.exit_to_app),
-          title: Text("Sign out"),
+          title: Text("Sign Out"),
           onTap: () {
             Auth.signOut().then((b) {
               if (b)
