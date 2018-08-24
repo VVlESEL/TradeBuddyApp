@@ -41,7 +41,7 @@ class _TradeBuddyState extends State<TradeBuddy>
   @override
   void dispose() {
     _animationTimer?.cancel();
-    _bannerAd?.dispose();
+    _bannerAd?.dispose()?.then((b) => _bannerAd = null);
     _animationController?.dispose();
     super.dispose();
   }
@@ -97,7 +97,15 @@ class _TradeBuddyState extends State<TradeBuddy>
             ? Login()
             : Scaffold(
                 appBar: AppBar(
-                  title: Text("Trade Buddy"),
+                  title: Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(3.0),
+                        child: Image.asset("images/logo_bmtrading.png",),
+                      ),
+                      Text("Trade Buddy"),
+                    ],
+                  ),
                   actions: <Widget>[
                     FlatButton(
                       child: AnimatedStar(
@@ -150,8 +158,7 @@ class _TradeBuddyState extends State<TradeBuddy>
           );
         return Trades();
       case 1:
-        _bannerAd?.dispose();
-        _bannerAd = null;
+        _bannerAd?.dispose()?.then((b) => _bannerAd = null);
         return Analytics();
       case 2:
         _bannerAd ??= createBannerAd()
@@ -170,7 +177,6 @@ class _TradeBuddyState extends State<TradeBuddy>
 class AnimatedStar extends StatelessWidget {
   final Animation<double> controller;
   final Animation<Color> color;
-  final Animation<double> rotate;
   final Animation<double> size;
 
   AnimatedStar({Key key, this.controller})

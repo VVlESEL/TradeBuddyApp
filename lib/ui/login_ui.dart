@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trade_buddy/ui/legal_ui.dart';
 import 'package:trade_buddy/utils/auth.dart';
 import 'package:trade_buddy/main.dart';
 
@@ -10,6 +11,8 @@ class Login extends StatefulWidget {
 enum FormType { login, register, forgot }
 
 class _LoginState extends State<Login> {
+  bool _isPolicyAccepted = false;
+  Color _privacyPolicyColor = Colors.black;
   FormType _formType = FormType.login;
   final GlobalKey<FormState> _formKey = GlobalKey();
   final TextEditingController _controllerEmail = TextEditingController();
@@ -46,6 +49,33 @@ class _LoginState extends State<Login> {
                       ? _getRegisterForm()
                       : _getForgotForm())
             ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Row(
+              children: <Widget>[
+                Checkbox(
+                  value: _isPolicyAccepted,
+                  onChanged: (b) => setState(() => _isPolicyAccepted = b),
+                ),
+                Flexible(
+                  child: Column(
+                    children: <Widget>[
+                      FlatButton(
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => Legal())),
+                        child: Text(
+                          "I have read and accept the Privacy Policy and the EULA (click here to read)",
+                          style: TextStyle(color: _privacyPolicyColor),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -102,22 +132,33 @@ class _LoginState extends State<Login> {
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: FlatButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_formKey.currentState.validate()) {
-                  Auth
+                  if(!checkPrivacyPolicy()) return;
+
+                  bool isSingedIn;
+                  await Auth
                       .emailSignIn(
-                          _controllerEmail.text, _controllerPassword.text)
+                      _controllerEmail.text, _controllerPassword.text)
                       .then((b) {
-                    if (b)
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (BuildContext context) => TradeBuddy()),
-                          (_) => false);
+                    isSingedIn = b;
                   });
+                  if (isSingedIn) {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => TradeBuddy()),
+                            (_) => false);
+                  } else {
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          "Request failed! Please check your inputs and make sure you are connected to the internet."),
+                      duration: Duration(milliseconds: 3000),
+                    ));
+                  }
                 }
               },
-              child: Text("Login"),
+              child: Text("Login", style: TextStyle(fontSize: 20.0)),
             ),
           ),
           Row(
@@ -218,22 +259,33 @@ class _LoginState extends State<Login> {
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: FlatButton(
-              onPressed: () {
+              onPressed: () async {
+                if (!checkPrivacyPolicy()) return;
+
                 if (_formKey.currentState.validate()) {
-                  Auth
+                  bool isCreated;
+                  await Auth
                       .createUser(
                           _controllerEmail.text, _controllerPassword.text)
                       .then((b) {
-                    if (b)
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (BuildContext context) => TradeBuddy()),
-                          (_) => false);
+                    isCreated = b;
                   });
+                  if (isCreated) {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => TradeBuddy()),
+                        (_) => false);
+                  } else {
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              "Request failed! Please check your inputs and make sure you are connected to the internet."),
+                          duration: Duration(milliseconds: 3000),
+                        ));
+                  }
                 }
               },
-              child: Text("Sign up"),
+              child: Text("Sign up", style: TextStyle(fontSize: 20.0)),
             ),
           ),
           Row(
@@ -292,17 +344,28 @@ class _LoginState extends State<Login> {
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: FlatButton(
-              onPressed: () {
+              onPressed: () async {
+                if (!checkPrivacyPolicy()) return;
+
                 if (_formKey.currentState.validate()) {
-                  Auth.sendPasswordResetEmail(_controllerEmail.text);
+                  bool isSent;
+                  await Auth
+                      .sendPasswordResetEmail(_controllerEmail.text)
+                      .then((b) {
+                    isSent = b;
+                  });
                   Scaffold.of(context).showSnackBar(SnackBar(
                         content: Text(
-                            "Reset Password was sent to ${_controllerEmail.text}"),
+                          !isSent
+                              ? "Request failed! Please check your inputs and make sure you are connected to the internet."
+                              : "Reset Link was sent to ${_controllerEmail
+                          .text}.",
+                        ),
                         duration: Duration(milliseconds: 3000),
                       ));
                 }
               },
-              child: Text("Send new Password"),
+              child: Text("Reset Password", style: TextStyle(fontSize: 20.0)),
             ),
           ),
           Row(
@@ -327,5 +390,15 @@ class _LoginState extends State<Login> {
         ],
       ),
     );
+  }
+
+  bool checkPrivacyPolicy() {
+    if (!_isPolicyAccepted) {
+      setState(() => _privacyPolicyColor = Theme.of(context).errorColor);
+      return false;
+    } else {
+      setState(() => _privacyPolicyColor = Colors.black);
+      return true;
+    }
   }
 }

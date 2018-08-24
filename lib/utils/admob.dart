@@ -11,7 +11,7 @@ final MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
 );
 
 BannerAd createBannerAd() {
-  return new BannerAd(
+  return BannerAd(
     adUnitId: /*BannerAd.testAdUnitId,*/ "ca-app-pub-4539817448561450/7055661814",// Replace the testAdUnitId with an ad unit id from the AdMob dash.
     size: AdSize.banner,
     targetingInfo: targetingInfo,
@@ -22,8 +22,8 @@ BannerAd createBannerAd() {
 }
 
 InterstitialAd createInterstitialAd() {
-  return new InterstitialAd(
-    adUnitId: InterstitialAd.testAdUnitId, // Replace the testAdUnitId with an ad unit id from the AdMob dash.
+  return InterstitialAd(
+    adUnitId: /*InterstitialAd.testAdUnitId,*/ "ca-app-pub-4539817448561450/5669679522", // Replace the testAdUnitId with an ad unit id from the AdMob dash.
     targetingInfo: targetingInfo,
     listener: (MobileAdEvent event) {
       print("InterstitialAd event $event");

@@ -10,7 +10,7 @@ class SettingsController {
 
   static num _balance = 0.0;
   static String _currentAccount;
-  static Map _accounts;
+  static Map accounts;
 
   ///The function initializes the controller
   static Future<void> initialize() async {
@@ -47,11 +47,6 @@ class SettingsController {
           break;
       }
     });
-  }
-
-  static Map get accounts => _accounts;
-  static set accounts(Map value) {
-    _accounts = value;
   }
 
   static String get currentAccount => _currentAccount;
