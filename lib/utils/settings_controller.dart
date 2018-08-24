@@ -16,6 +16,7 @@ class SettingsController {
   static Future<void> initialize() async {
     //get initial settings
     var snapshot = await reference.once();
+    print(snapshot.value);
     if (snapshot.value == null) return;
     balance = snapshot.value["balance"];
     accounts = snapshot.value["accounts"];

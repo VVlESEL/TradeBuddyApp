@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trade_buddy/ui/accounts_ui.dart';
-import 'package:trade_buddy/ui/eula_ui.dart';
 import 'package:trade_buddy/ui/legal_ui.dart';
 import 'package:trade_buddy/ui/login_ui.dart';
-import 'package:trade_buddy/ui/privacy_policy_ui.dart';
 import 'package:trade_buddy/utils/auth.dart';
 
 class Settings extends StatefulWidget {

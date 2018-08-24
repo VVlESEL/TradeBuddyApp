@@ -22,7 +22,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.bmtrading.tradebuddy"
+        applicationId "com.renebalke.tradebuddy"
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1

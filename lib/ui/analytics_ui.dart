@@ -7,8 +7,7 @@ class Analytics extends StatefulWidget {
   _AnalyticsState createState() => _AnalyticsState();
 }
 
-class _AnalyticsState extends State<Analytics>
-    with SingleTickerProviderStateMixin {
+class _AnalyticsState extends State<Analytics> with SingleTickerProviderStateMixin {
   TabController tabController;
 
   @override

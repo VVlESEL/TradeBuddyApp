@@ -1,6 +1,5 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
-import 'package:trade_buddy/utils/settings_controller.dart';
 import 'package:trade_buddy/utils/trades_controller.dart';
 
 class AnalyticsChart extends StatelessWidget {

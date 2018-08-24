@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Eula extends StatelessWidget {
-  var version = 1.0;
+  final version = 1.0;
 
   @override
   Widget build(BuildContext context) {

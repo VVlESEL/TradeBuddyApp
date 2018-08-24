@@ -1,4 +1,23 @@
 import 'package:firebase_admob/firebase_admob.dart';
+import 'package:flutter/foundation.dart';
+
+String getAdMobAppId(){
+  return defaultTargetPlatform == TargetPlatform.android
+      ? "ca-app-pub-4539817448561450~4872351601"
+      : "ca-app-pub-4539817448561450~5357838273";
+}
+
+String getAdMobBannerAdUnitId(){
+  return defaultTargetPlatform == TargetPlatform.android
+      ? "ca-app-pub-4539817448561450/7055661814"
+      : "ca-app-pub-4539817448561450/9651063230";
+}
+
+String getAdMobInterstitialAdUnitId(){
+  return defaultTargetPlatform == TargetPlatform.android
+      ? "ca-app-pub-4539817448561450/5669679522"
+      : "ca-app-pub-4539817448561450/1899623776";
+}
 
 final MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
   keywords: <String>['trading', 'forex', 'cfd'],
@@ -12,7 +31,7 @@ final MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
 
 BannerAd createBannerAd() {
   return BannerAd(
-    adUnitId: /*BannerAd.testAdUnitId,*/ "ca-app-pub-4539817448561450/7055661814",// Replace the testAdUnitId with an ad unit id from the AdMob dash.
+    adUnitId: getAdMobBannerAdUnitId(),
     size: AdSize.banner,
     targetingInfo: targetingInfo,
     listener: (MobileAdEvent event) {
@@ -23,7 +42,7 @@ BannerAd createBannerAd() {
 
 InterstitialAd createInterstitialAd() {
   return InterstitialAd(
-    adUnitId: /*InterstitialAd.testAdUnitId,*/ "ca-app-pub-4539817448561450/5669679522", // Replace the testAdUnitId with an ad unit id from the AdMob dash.
+    adUnitId: getAdMobInterstitialAdUnitId(),
     targetingInfo: targetingInfo,
     listener: (MobileAdEvent event) {
       print("InterstitialAd event $event");

@@ -15,8 +15,8 @@ bool _isLoaded = false;
 bool _isSignedIn = false;
 
 void main() {
-  FirebaseAdMob.instance
-      .initialize(appId: "ca-app-pub-4539817448561450~4872351601");
+  FirebaseAdMob.instance.initialize(
+      appId: getAdMobAppId());
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -101,7 +101,9 @@ class _TradeBuddyState extends State<TradeBuddy>
                     children: <Widget>[
                       Padding(
                         padding: const EdgeInsets.all(3.0),
-                        child: Image.asset("images/logo_bmtrading.png",),
+                        child: Image.asset(
+                          "images/logo_bmtrading.png",
+                        ),
                       ),
                       Text("Trade Buddy"),
                     ],
