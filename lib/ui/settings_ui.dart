@@ -80,8 +80,8 @@ class _SettingsState extends State<Settings> {
 
     return AlertDialog(
       title: Text("Set Starting Balance"),
-      content: ListView(
-        shrinkWrap: true,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
               "The starting balance is relevant for the calculation of the maximum drawdown in percent."),
@@ -89,6 +89,7 @@ class _SettingsState extends State<Settings> {
             key: _formKey,
             child: TextFormField(
               textAlign: TextAlign.center,
+              maxLines: 1,
               controller: _textController,
               validator: (text) {
                 if (!isNumeric(text)) {
