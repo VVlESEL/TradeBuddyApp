@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:trade_buddy/ui/legal_ui.dart';
+import 'package:trade_buddy/ui/legal/legal_ui.dart';
 import 'package:trade_buddy/utils/auth.dart';
 import 'package:trade_buddy/main.dart';
 
@@ -22,62 +22,75 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        shrinkWrap: true,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 50.0),
-          ),
-          Image.asset(
-            "images/logo_bmtrading.png",
-            width: 120.0,
-            height: 120.0,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 50.0),
-          ),
-          ExpansionTile(
-            leading: Icon(
-              Icons.email,
-              size: 40.0,
+      resizeToAvoidBottomPadding: false,
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+              "images/background_login.png",
             ),
-            title: Text("Login with E-Mail"),
+            fit: BoxFit.fill,
+          ),
+        ),
+        child: Container(
+          color: Colors.white.withOpacity(0.5),
+          child: ListView(
             children: <Widget>[
-              _formType == FormType.login
-                  ? _getLoginForm()
-                  : (_formType == FormType.register
-                      ? _getRegisterForm()
-                      : _getForgotForm())
+              Padding(
+                padding: const EdgeInsets.only(top: 50.0),
+              ),
+              Image.asset(
+                "images/icon_bmtrading.png",
+                width: 120.0,
+                height: 120.0,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 50.0),
+              ),
+              ExpansionTile(
+                leading: Icon(
+                  Icons.email,
+                  size: 40.0,
+                ),
+                title: Text("Login with E-Mail"),
+                children: <Widget>[
+                  _formType == FormType.login
+                      ? _getLoginForm()
+                      : (_formType == FormType.register
+                          ? _getRegisterForm()
+                          : _getForgotForm())
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Row(
+                  children: <Widget>[
+                    Checkbox(
+                      value: _isPolicyAccepted,
+                      onChanged: (b) => setState(() => _isPolicyAccepted = b),
+                    ),
+                    Flexible(
+                      child: Column(
+                        children: <Widget>[
+                          FlatButton(
+                            onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) => Legal())),
+                            child: Text(
+                              "I have read and accept the Privacy Policy and the EULA (click here to read)",
+                              style: TextStyle(color: _privacyPolicyColor),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Row(
-              children: <Widget>[
-                Checkbox(
-                  value: _isPolicyAccepted,
-                  onChanged: (b) => setState(() => _isPolicyAccepted = b),
-                ),
-                Flexible(
-                  child: Column(
-                    children: <Widget>[
-                      FlatButton(
-                        onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext context) => Legal())),
-                        child: Text(
-                          "I have read and accept the Privacy Policy and the EULA (click here to read)",
-                          style: TextStyle(color: _privacyPolicyColor),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -134,12 +147,12 @@ class _LoginState extends State<Login> {
             child: FlatButton(
               onPressed: () async {
                 if (_formKey.currentState.validate()) {
-                  if(!checkPrivacyPolicy()) return;
+                  if (!checkPrivacyPolicy()) return;
 
                   bool isSingedIn;
                   await Auth
                       .emailSignIn(
-                      _controllerEmail.text, _controllerPassword.text)
+                          _controllerEmail.text, _controllerPassword.text)
                       .then((b) {
                     isSingedIn = b;
                   });
@@ -148,13 +161,13 @@ class _LoginState extends State<Login> {
                         context,
                         MaterialPageRoute(
                             builder: (BuildContext context) => TradeBuddy()),
-                            (_) => false);
+                        (_) => false);
                   } else {
                     Scaffold.of(context).showSnackBar(SnackBar(
-                      content: Text(
-                          "Request failed! Please check your inputs and make sure you are connected to the internet."),
-                      duration: Duration(milliseconds: 3000),
-                    ));
+                          content: Text(
+                              "Request failed! Please check your inputs and make sure you are connected to the internet."),
+                          duration: Duration(milliseconds: 3000),
+                        ));
                   }
                 }
               },

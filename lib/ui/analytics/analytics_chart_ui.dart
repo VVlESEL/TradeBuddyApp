@@ -20,7 +20,7 @@ class AnalyticsChart extends StatelessWidget {
 
     final data = TradesController.trades.map((trade){
       equity += trade.profit;
-      DateTime time = DateTime.tryParse(trade.opentime.replaceAll(".", "-"));
+      DateTime time = DateTime.tryParse(trade.closetime.replaceAll(".", "-"));
       return TimeSeriesTrade(time, equity);
     }).toList();
 

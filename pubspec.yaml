@@ -46,7 +46,16 @@ flutter:
 
   assets:
     - images/icon_google.png
-    - images/logo_bmtrading.png
+    - images/icon_bmtrading.png
+
+    - images/background_login.png
+
+    - images/instruction_mql4.png
+    - images/instruction_open_data_folder.png
+    - images/instruction_options.png
+    - images/instruction_scripts.png
+    - images/instruction_tradebuddyweb.png
+    - images/instruction_expert_advisors.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

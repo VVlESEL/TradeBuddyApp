@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:trade_buddy/ui/analytics_chart_ui.dart';
-import 'package:trade_buddy/ui/analytics_numbers_ui.dart';
+import 'package:trade_buddy/ui/analytics/analytics_chart_ui.dart';
+import 'package:trade_buddy/ui/analytics/analytics_numbers_ui.dart';
 
 class Analytics extends StatefulWidget {
   @override

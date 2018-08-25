@@ -5,6 +5,16 @@ import 'package:trade_buddy/utils/trades_controller.dart';
 
 class AnalyticsController{
 
+  /*
+  //
+  //
+  //Could calculate analytics graphic data hashmap here, saves one iteration
+  //
+  //
+  //
+   */
+
+
   static num netProfit = 0;
   static num profitFactor;
   static num tradesAmount = 0;
@@ -77,16 +87,17 @@ class AnalyticsController{
       //calculate other numbers
       //calculate profit, profitBuy, profitSell
       tradesAmount++;
+      if(t.type == "buy") buyTradesAmount++;
+      else sellTradesAmount++;
+
       if(profit >= 0){
         wonTrades++;
         grossProfit += profit;
         if(profit > biggestProfit) biggestProfit = profit;
 
         if(t.type == "buy"){
-          buyTradesAmount++;
           buyPositionsWon++;
         }else{
-          sellTradesAmount++;
           sellPositionsWon++;
         }
 
@@ -119,12 +130,12 @@ class AnalyticsController{
     profitFactor = (grossProfit / grossLoss).abs();
 
     expectedProfit = netProfit / tradesAmount;
-    sellTradesPercent = sellPositionsWon/sellTradesAmount;
+    sellTradesPercent = sellPositionsWon/sellTradesAmount*100;
     wonTradesAmount = buyPositionsWon+sellPositionsWon;
     wonTradesPercent = wonTradesAmount/tradesAmount*100;
     averageProfit = grossProfit/wonTrades;
 
-    buyTradesPercent = buyPositionsWon/buyTradesAmount;
+    buyTradesPercent = buyPositionsWon/buyTradesAmount*100;
     lostTradesAmount = tradesAmount-buyPositionsWon-sellPositionsWon;
     lostTradesPercent = lostTradesAmount/tradesAmount*100;
     averageLoss = grossLoss/lostTrades;

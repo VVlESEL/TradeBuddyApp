@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:trade_buddy/ui/analytics_ui.dart';
+import 'package:trade_buddy/ui/analytics/analytics_ui.dart';
 import 'package:trade_buddy/ui/login_ui.dart';
 import 'package:trade_buddy/ui/settings_ui.dart';
 import 'package:trade_buddy/ui/trades_ui.dart';
@@ -15,8 +15,7 @@ bool _isLoaded = false;
 bool _isSignedIn = false;
 
 void main() {
-  FirebaseAdMob.instance.initialize(
-      appId: getAdMobAppId());
+  FirebaseAdMob.instance.initialize(appId: getAdMobAppId());
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -39,9 +38,14 @@ class _TradeBuddyState extends State<TradeBuddy>
   int _menuIndex = 0;
 
   @override
+  void deactivate() {
+    _bannerAd?.dispose()?.then((b) => _bannerAd = null);
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
     _animationTimer?.cancel();
-    _bannerAd?.dispose()?.then((b) => _bannerAd = null);
     _animationController?.dispose();
     super.dispose();
   }
@@ -102,7 +106,7 @@ class _TradeBuddyState extends State<TradeBuddy>
                       Padding(
                         padding: const EdgeInsets.all(3.0),
                         child: Image.asset(
-                          "images/logo_bmtrading.png",
+                          "images/icon_bmtrading.png",
                         ),
                       ),
                       Text("Trade Buddy"),
@@ -153,22 +157,30 @@ class _TradeBuddyState extends State<TradeBuddy>
     switch (_menuIndex) {
       case 0:
         _bannerAd ??= createBannerAd()
-          ..load()
-          ..show(
-            anchorType: AnchorType.bottom,
-            anchorOffset: 60.0,
-          );
+          ..load().then((loaded) {
+            if (loaded && this.mounted) {
+              _bannerAd
+                ..show(
+                  anchorType: AnchorType.bottom,
+                  anchorOffset: 60.0,
+                );
+            }
+          });
         return Trades();
       case 1:
         _bannerAd?.dispose()?.then((b) => _bannerAd = null);
         return Analytics();
       case 2:
         _bannerAd ??= createBannerAd()
-          ..load()
-          ..show(
-            anchorType: AnchorType.bottom,
-            anchorOffset: 60.0,
-          );
+          ..load().then((loaded) {
+            if (loaded && this.mounted) {
+              _bannerAd
+                ..show(
+                  anchorType: AnchorType.bottom,
+                  anchorOffset: 60.0,
+                );
+            }
+          });
         return Settings();
       default:
         return Container();

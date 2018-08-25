@@ -22,22 +22,22 @@ class TradesController {
     trades.clear();
 
     //add a listener for new child and check if it meets the filter criteria
-    reference.onChildAdded.listen((event) {
+    reference.orderByChild("closetime").onChildAdded.listen((event) {
       if (addTrade(Trade.fromJson(event.snapshot.key, event.snapshot.value))) {
-        _tradesSubject.add(UnmodifiableListView(trades));
+        _tradesSubject.add(UnmodifiableListView(trades.reversed));
       }
     });
 
     reference.onChildRemoved.listen((event) {
       trades.removeWhere(
           (trade) => trade.id == int.tryParse(event.snapshot.key) ?? 0);
-      _tradesSubject.add(UnmodifiableListView(trades));
+      _tradesSubject.add(UnmodifiableListView(trades.reversed));
     });
   }
 
   ///The function updates all trades in the db that meet the filter criteria
   static Future<void> updateTrades() async {
-    DataSnapshot dbTrades = await reference.once();
+    DataSnapshot dbTrades = await reference.orderByChild("closetime").once();
     if (dbTrades.value == null) return;
 
     trades.clear();
@@ -45,7 +45,7 @@ class TradesController {
       addTrade(Trade.fromJson(key, value));
     });
 
-    _tradesSubject.add(UnmodifiableListView(trades));
+    _tradesSubject.add(UnmodifiableListView(trades.reversed));
   }
 
   ///The function adds a single trade that meets the filter criteria to the list
