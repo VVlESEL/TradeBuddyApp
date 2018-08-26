@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trade_buddy/main.dart' as main;
 import 'package:trade_buddy/ui/accounts_ui.dart';
 import 'package:trade_buddy/ui/instruction_ui.dart';
 import 'package:trade_buddy/ui/legal/legal_ui.dart';
@@ -61,6 +62,8 @@ class _SettingsState extends State<Settings> {
           onTap: () {
             Auth.signOut().then((b) {
               if (b)
+                main.isLoaded = false;
+                main.isSignedIn = false;
                 Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(

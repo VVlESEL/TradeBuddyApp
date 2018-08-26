@@ -54,11 +54,15 @@ class _LoginState extends State<Login> {
                 ),
                 title: Text("Login with E-Mail"),
                 children: <Widget>[
-                  _formType == FormType.login
-                      ? _getLoginForm()
-                      : (_formType == FormType.register
-                          ? _getRegisterForm()
-                          : _getForgotForm())
+                  Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Builder(builder: (BuildContext context) {
+                        return _formType == FormType.login
+                            ? _getLoginForm(context)
+                            : (_formType == FormType.register
+                            ? _getRegisterForm(context)
+                            : _getForgotForm(context));
+                      }))
                 ],
               ),
               Padding(
@@ -95,7 +99,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Widget _getLoginForm() {
+  Widget _getLoginForm(BuildContext context) {
     return Form(
       key: _formKey,
       child: Column(
@@ -198,7 +202,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Widget _getRegisterForm() {
+  Widget _getRegisterForm(BuildContext context) {
     return Form(
       key: _formKey,
       child: Column(
@@ -292,7 +296,10 @@ class _LoginState extends State<Login> {
                   } else {
                     Scaffold.of(context).showSnackBar(SnackBar(
                           content: Text(
-                              "Request failed! Please check your inputs and make sure you are connected to the internet."),
+                              "Request failed! Please check your inputs and "
+                                  "make sure you are connected to the internet. "
+                                  "If you have connection the e-mail has most "
+                                  "likely already been registered."),
                           duration: Duration(milliseconds: 3000),
                         ));
                   }
@@ -325,7 +332,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Widget _getForgotForm() {
+  Widget _getForgotForm(BuildContext context) {
     return Form(
       key: _formKey,
       child: Column(

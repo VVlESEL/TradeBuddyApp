@@ -1,4 +1,4 @@
-class Trade {
+class Trade implements Comparable {
   num id;
   String symbol;
   num lots;
@@ -34,6 +34,12 @@ class Trade {
   @override
   bool operator ==(other) {
     return this.id == (other.id);
+  }
+
+  @override
+  int compareTo(other) {
+    Trade temp = other;
+    return this.closetime.compareTo(temp.closetime);
   }
 
   @override

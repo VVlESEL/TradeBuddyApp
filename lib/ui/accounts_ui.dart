@@ -8,12 +8,16 @@ class Accounts extends StatefulWidget {
 }
 
 class _AccountsState extends State<Accounts> {
+  var _selectedAccount = SettingsController.currentAccount;
 
   @override
   void dispose() {
     super.dispose();
 
-    TradesController.initialize();
+    if (_selectedAccount != SettingsController.currentAccount) {
+      SettingsController.currentAccount = _selectedAccount;
+      TradesController.initialize();
+    }
   }
 
   @override
@@ -23,24 +27,23 @@ class _AccountsState extends State<Accounts> {
         title: Text("Accounts"),
       ),
       body: ListView(
-        children: SettingsController.accounts.keys.map((account) {
-          return Card(
-            elevation: 1.0,
-            color: SettingsController.currentAccount == account
-                ? Theme.of(context).primaryColor
-                : Colors.white,
-            child: ListTile(
-              title: Text("$account"),
-              onTap: () {
-                if (SettingsController.currentAccount != account) {
-                  setState(() {
-                    SettingsController.currentAccount = account;
-                  });
-                }
-              },
-            ),
-          );
-        }).toList(),
+        children: SettingsController.accounts?.keys?.map((account) {
+              return Card(
+                elevation: 1.0,
+                color: _selectedAccount == account
+                    ? Theme.of(context).primaryColor
+                    : Colors.white,
+                child: ListTile(
+                  title: Text("$account"),
+                  onTap: () {
+                    if (_selectedAccount != account) {
+                      setState(() => _selectedAccount = account);
+                    }
+                  },
+                ),
+              );
+            })?.toList() ??
+            [Text("No Accounts found...")],
       ),
     );
   }

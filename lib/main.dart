@@ -11,8 +11,8 @@ import 'package:trade_buddy/utils/trades_controller.dart';
 import 'package:trade_buddy/utils/admob.dart';
 import 'dart:async';
 
-bool _isLoaded = false;
-bool _isSignedIn = false;
+bool isLoaded = false;
+bool isSignedIn = false;
 
 void main() {
   FirebaseAdMob.instance.initialize(appId: getAdMobAppId());
@@ -67,7 +67,7 @@ class _TradeBuddyState extends State<TradeBuddy>
       },
     );
 
-    if (!_isLoaded) {
+    if (!isLoaded) {
       Auth.checkSignIn().then((b) async {
         //get all the trades from the db and store them in the db
         if (b) {
@@ -77,8 +77,8 @@ class _TradeBuddyState extends State<TradeBuddy>
 
         //inform the ui that data is loaded
         setState(() {
-          _isSignedIn = b;
-          _isLoaded = true;
+          isSignedIn = b;
+          isLoaded = true;
         });
 
         //enable offline caching
@@ -95,9 +95,9 @@ class _TradeBuddyState extends State<TradeBuddy>
 
   @override
   Widget build(BuildContext context) {
-    return !_isLoaded
+    return !isLoaded
         ? Center(child: CircularProgressIndicator())
-        : (!_isSignedIn
+        : (!isSignedIn
             ? Login()
             : Scaffold(
                 appBar: AppBar(
