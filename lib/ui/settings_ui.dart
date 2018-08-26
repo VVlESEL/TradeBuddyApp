@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:trade_buddy/main.dart' as main;
-import 'package:trade_buddy/ui/accounts_ui.dart';
 import 'package:trade_buddy/ui/instruction_ui.dart';
 import 'package:trade_buddy/ui/legal/legal_ui.dart';
 import 'package:trade_buddy/ui/login_ui.dart';
 import 'package:trade_buddy/utils/auth.dart';
 import 'package:trade_buddy/utils/settings_controller.dart';
+import 'package:trade_buddy/utils/trades_controller.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -20,17 +20,18 @@ class _SettingsState extends State<Settings> {
         ListTile(
           leading: Icon(Icons.format_list_numbered),
           title: Text("Accounts"),
+          trailing: Text("${SettingsController.currentAccount}"),
           onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (BuildContext context) => Accounts()));
+            showDialog(
+                context: context,
+                builder: (BuildContext context) => _showAccountsDialog());
           },
         ),
         Divider(height: 1.0),
         ListTile(
           leading: Icon(Icons.attach_money),
           title: Text("Starting Balance"),
+          trailing: Text("${SettingsController.balance}"),
           onTap: () {
             showDialog(
                 context: context,
@@ -59,20 +60,47 @@ class _SettingsState extends State<Settings> {
         ListTile(
           leading: Icon(Icons.exit_to_app),
           title: Text("Sign Out"),
+          trailing: Text("${Auth.user.email}"),
           onTap: () {
-            Auth.signOut().then((b) {
-              if (b)
-                main.isLoaded = false;
-                main.isSignedIn = false;
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => Login()),
-                    (_) => false);
-            });
-          },
+            showDialog(context: context, builder: (BuildContext context) => _showLogoutDialog());
+          }
         ),
         Divider(height: 1.0),
+      ],
+    );
+  }
+
+  AlertDialog _showAccountsDialog() {
+    return AlertDialog(
+      title: Text("Choose Account"),
+      content: ListView(
+        shrinkWrap: true,
+        children: SettingsController.accounts?.keys?.map((account) {
+              return Card(
+                elevation: 1.0,
+                color: SettingsController.currentAccount == account
+                    ? Theme.of(context).primaryColor
+                    : Colors.white,
+                child: ListTile(
+                  title: Text("$account"),
+                  onTap: () {
+                    if (SettingsController.currentAccount != account) {
+                      setState(
+                          () => SettingsController.currentAccount = account);
+                      TradesController.initialize();
+                    }
+                    Navigator.pop(context);
+                  },
+                ),
+              );
+            })?.toList() ??
+            [Text("No Accounts found...")],
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text("Cancel"),
+          onPressed: () => Navigator.pop(context),
+        ),
       ],
     );
   }
@@ -111,17 +139,54 @@ class _SettingsState extends State<Settings> {
         FlatButton(
           child: Text("Confirm"),
           onPressed: () {
-            print(_formKey.currentState.validate());
-            print(double.tryParse(_textController.text));
             if (_formKey.currentState.validate()) {
-              SettingsController.balance =
-                  double.tryParse(_textController.text);
+              setState(() {
+                SettingsController.balance =
+                    double.tryParse(_textController.text);
+              });
               Navigator.pop(context);
             }
           },
         ),
         FlatButton(
           child: Text("Cancel"),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
+    );
+  }
+
+  AlertDialog _showLogoutDialog(){
+    return AlertDialog(
+      title: Text("Logout"),
+      content: Text("Are you sure that you want to logout?"),
+      actions: <Widget>[
+        FlatButton(
+          child: Text(
+            "Yes",
+            style: TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          onPressed: () {
+            Auth.signOut().then((b) {
+              if (b) {
+                main.isLoaded = false;
+                main.isSignedIn = false;
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => Login()),
+                        (_) => false);
+              }
+            });
+          },
+        ),
+        FlatButton(
+          child: Text(
+            "Cancel",
+            style: TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ],
