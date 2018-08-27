@@ -73,28 +73,29 @@ class _SettingsState extends State<Settings> {
   AlertDialog _showAccountsDialog() {
     return AlertDialog(
       title: Text("Choose Account"),
-      content: ListView(
-        shrinkWrap: true,
-        children: SettingsController.accounts?.keys?.map((account) {
-              return Card(
-                elevation: 1.0,
-                color: SettingsController.currentAccount == account
-                    ? Theme.of(context).primaryColor
-                    : Colors.white,
-                child: ListTile(
-                  title: Text("$account"),
-                  onTap: () {
-                    if (SettingsController.currentAccount != account) {
-                      setState(
-                          () => SettingsController.currentAccount = account);
-                      TradesController.initialize();
-                    }
-                    Navigator.pop(context);
-                  },
-                ),
-              );
-            })?.toList() ??
-            [Text("No Accounts found...")],
+      content: SingleChildScrollView(
+        child: Column(
+          children: SettingsController.accounts?.keys?.map((account) {
+                return Card(
+                  elevation: 1.0,
+                  color: SettingsController.currentAccount == account
+                      ? Theme.of(context).primaryColor
+                      : Colors.white,
+                  child: ListTile(
+                    title: Text("$account"),
+                    onTap: () {
+                      if (SettingsController.currentAccount != account) {
+                        setState(
+                            () => SettingsController.currentAccount = account);
+                        TradesController.initialize();
+                      }
+                      Navigator.pop(context);
+                    },
+                  ),
+                );
+              })?.toList() ??
+              [Text("No Accounts found...")],
+        ),
       ),
       actions: <Widget>[
         FlatButton(
