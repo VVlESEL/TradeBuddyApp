@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:trade_buddy/utils/auth.dart';
 import 'dart:async';
 
@@ -8,9 +9,21 @@ class SettingsController {
   //get a reference to the trades db entry of the user
   static DatabaseReference reference;
 
-  static num _balance = 10000;
+  ///streams the current balance
+  static Stream<num> get balanceStream => _balanceSubject.stream;
+  static final _balanceSubject = BehaviorSubject<num>();
+  static num _balance;
+
+  ///streams the current balance
+  static Stream<String> get currentAccountStream =>
+      _currentAccountSubject.stream;
+  static final _currentAccountSubject = BehaviorSubject<String>();
   static String _currentAccount;
-  static Map accounts;
+
+  ///streams the current balance
+  static Stream<Map> get accountsStream => _accountsSubject.stream;
+  static final _accountsSubject = BehaviorSubject<Map>();
+  static Map _accounts;
 
   ///The function initializes the controller
   static Future<void> initialize() async {
@@ -20,14 +33,13 @@ class SettingsController {
 
     //get initial settings
     var snapshot = await reference.once();
-
     if (snapshot.value != null && snapshot.value["accounts"] != "initialized") {
       //get all accounts
       accounts = snapshot.value["accounts"];
 
       //get current account
       currentAccount = snapshot.value["current_account"];
-      if (currentAccount == null && accounts != null) {
+      if (currentAccount == null) {
         currentAccount = accounts.keys.first;
         reference.update({
           "current_account": currentAccount,
@@ -36,13 +48,13 @@ class SettingsController {
 
       //get balance for the current account
       try {
-        _balance = snapshot.value["accounts"][currentAccount]["balance"];
+        balance = snapshot.value["accounts"][currentAccount]["balance"];
       } catch (error) {
-        _balance = 10000;
+        balance = 10000;
       }
 
-      print("AnalyticsController.initialize(): balance = $balance, accounts = "
-          "$accounts, currentAccount = $currentAccount");
+      print("AnalyticsController.initialize(): balance = $balance, "
+          "accounts = $accounts, currentAccount = $currentAccount");
     }
 
     //add a listener for new child and check if it meets the filter criteria
@@ -56,14 +68,13 @@ class SettingsController {
               "current_account": currentAccount,
             });
             try {
-              _balance = snapshot.value["accounts"][currentAccount]["balance"];
+              balance = snapshot.value["accounts"][currentAccount]["balance"];
             } catch (error) {
-              _balance = 10000;
+              balance = 10000;
             }
             TradesController.initialize();
           }
-          print(
-              "AnalysticsController onChildChanged.listen: balance = $balance, "
+          print("AnalyticsController.initialize(): balance = $balanceStream, "
               "accounts = $accounts, currentAccount = $currentAccount");
           break;
         case "current_account":
@@ -71,33 +82,42 @@ class SettingsController {
               await reference.child("accounts/$currentAccount").once();
           if (snapshot.value == null) return;
           try {
-            _balance = snapshot.value["balance"];
+            balance = snapshot.value["accounts"][currentAccount]["balance"];
           } catch (error) {
-            _balance = 10000;
+            balance = 10000;
           }
-          print(
-              "AnalysticsController onChildChanged.listen: balance = $balance, "
-                  "accounts = $accounts, currentAccount = $currentAccount");
+          TradesController.initialize();
+          print("AnalyticsController.initialize(): balance = $balanceStream, "
+              "accounts = $accounts, currentAccount = $currentAccount");
           break;
       }
     });
   }
 
-  static String get currentAccount => _currentAccount;
+  static Map get accounts => _accounts;
+  static set accounts(Map value) {
+    print("accounts = $value");
+    _accounts = value;
+    _accountsSubject.add(value);
+  }
 
+  static String get currentAccount => _currentAccount;
   static set currentAccount(String value) {
+    print("currentAccount = $value");
     _currentAccount = value;
+    _currentAccountSubject.add(value);
     reference.update({
-      "current_account": currentAccount,
+      "current_account": value,
     });
   }
 
   static num get balance => _balance;
-
   static set balance(num value) {
+    print("balance = $value");
     _balance = value;
-    reference.child("accounts/$currentAccount").update({
-      "balance": balance,
+    _balanceSubject.add(value);
+    reference.child("accounts/${currentAccount}").update({
+      "balance": value,
     });
   }
 }

@@ -5,7 +5,6 @@ import 'package:trade_buddy/ui/legal/legal_ui.dart';
 import 'package:trade_buddy/ui/login_ui.dart';
 import 'package:trade_buddy/utils/auth.dart';
 import 'package:trade_buddy/utils/settings_controller.dart';
-import 'package:trade_buddy/utils/trades_controller.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -20,19 +19,30 @@ class _SettingsState extends State<Settings> {
         ListTile(
           leading: Icon(Icons.format_list_numbered),
           title: Text("Accounts"),
-          trailing: Text("${SettingsController.currentAccount}"),
+          trailing: StreamBuilder(
+              initialData: SettingsController.currentAccount,
+              stream: SettingsController.currentAccountStream,
+              builder: (BuildContext context, AsyncSnapshot snapshot) =>
+                  Text("${snapshot.data}")),
           onTap: () {
+            if(SettingsController.currentAccount == null) return;
             showDialog(
-                context: context,
-                builder: (BuildContext context) => _showAccountsDialog());
+              context: context,
+              builder: (BuildContext context) => _showAccountsDialog(),
+            );
           },
         ),
         Divider(height: 1.0),
         ListTile(
           leading: Icon(Icons.attach_money),
           title: Text("Starting Balance"),
-          trailing: Text("${SettingsController.balance}"),
+          trailing: StreamBuilder(
+              initialData: SettingsController.balance,
+              stream: SettingsController.balanceStream,
+              builder: (BuildContext context, AsyncSnapshot snapshot) =>
+                  Text("${snapshot.data}")),
           onTap: () {
+            if(SettingsController.balance == null) return;
             showDialog(
                 context: context,
                 builder: (BuildContext context) => _showBalanceDialog());
@@ -58,13 +68,14 @@ class _SettingsState extends State<Settings> {
         ),
         Divider(height: 1.0),
         ListTile(
-          leading: Icon(Icons.exit_to_app),
-          title: Text("Sign Out"),
-          trailing: Text("${Auth.user.email}"),
-          onTap: () {
-            showDialog(context: context, builder: (BuildContext context) => _showLogoutDialog());
-          }
-        ),
+            leading: Icon(Icons.exit_to_app),
+            title: Text("Sign Out"),
+            trailing: Text("${Auth.user.email}"),
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) => _showLogoutDialog());
+            }),
         Divider(height: 1.0),
       ],
     );
@@ -85,9 +96,7 @@ class _SettingsState extends State<Settings> {
                   title: Text("$account"),
                   onTap: () {
                     if (SettingsController.currentAccount != account) {
-                      setState(
-                          () => SettingsController.currentAccount = account);
-                      TradesController.initialize();
+                      SettingsController.currentAccount = account;
                     }
                     Navigator.pop(context);
                   },
@@ -127,9 +136,6 @@ class _SettingsState extends State<Settings> {
                   return "Please enter a valid number";
                 }
               },
-              decoration: InputDecoration(
-                hintText: "${SettingsController.balance}",
-              ),
               keyboardType: TextInputType.number,
             ),
           ),
@@ -156,7 +162,7 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  AlertDialog _showLogoutDialog(){
+  AlertDialog _showLogoutDialog() {
     return AlertDialog(
       title: Text("Logout"),
       content: Text("Are you sure that you want to logout?"),
@@ -164,8 +170,7 @@ class _SettingsState extends State<Settings> {
         FlatButton(
           child: Text(
             "Yes",
-            style: TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
           onPressed: () {
             Auth.signOut().then((b) {
@@ -176,7 +181,7 @@ class _SettingsState extends State<Settings> {
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) => Login()),
-                        (_) => false);
+                    (_) => false);
               }
             });
           },
@@ -184,8 +189,7 @@ class _SettingsState extends State<Settings> {
         FlatButton(
           child: Text(
             "Cancel",
-            style: TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
           onPressed: () => Navigator.pop(context),
         ),

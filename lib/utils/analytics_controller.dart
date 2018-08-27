@@ -12,12 +12,11 @@ class AnalyticsController{
   //
   //
   //
-   */
+  */
 
-
-  static num netProfit = 0;
+  static num netProfit;
   static num profitFactor;
-  static num tradesAmount = 0;
+  static num tradesAmount;
 
   static num grossProfit;
   static num expectedProfit;
@@ -42,7 +41,7 @@ class AnalyticsController{
   static num maxLossRowAmount;
   static num maxLossRowMoney;
 
-  static void calcNumbers(){
+  static void calcNumbers() {
     netProfit = 0;
     tradesAmount = 0;
     grossProfit = 0;
@@ -65,7 +64,8 @@ class AnalyticsController{
     num tempWinRowProfit = 0, tempLooseRowProfit = 0;
 
     //calclate maxDD and profit
-    num maxAccountBalance = SettingsController.balance;
+    num startingAccountBalance = SettingsController.balance;
+    num maxAccountBalance = startingAccountBalance;
 
     TradesController.trades.forEach((t){
       profit = t.profit + t.commission + t.swap;
@@ -73,7 +73,7 @@ class AnalyticsController{
       if(netProfit >= maxProfit){
         maxProfit = netProfit;
         tempDrawdown = 0;
-        maxAccountBalance = SettingsController.balance + netProfit;
+        maxAccountBalance = startingAccountBalance + netProfit;
       }
       else{
         tempDrawdown += profit;
@@ -125,7 +125,7 @@ class AnalyticsController{
     });
 
     //update numbers
-    if(SettingsController.balance == 0) maxDrawdownPercent = 99.99;
+    if(startingAccountBalance == 0) maxDrawdownPercent = 99.99;
 
     profitFactor = (grossProfit / grossLoss).abs();
 
