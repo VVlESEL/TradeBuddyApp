@@ -171,16 +171,7 @@ class _TradeBuddyState extends State<TradeBuddy>
         _bannerAd?.dispose()?.then((b) => _bannerAd = null);
         return Analytics();
       case 2:
-        _bannerAd ??= createBannerAd()
-          ..load().then((loaded) {
-            if (loaded && this.mounted) {
-              _bannerAd
-                ..show(
-                  anchorType: AnchorType.bottom,
-                  anchorOffset: 60.0,
-                );
-            }
-          });
+        _bannerAd?.dispose()?.then((b) => _bannerAd = null);
         return Settings();
       default:
         return Container();

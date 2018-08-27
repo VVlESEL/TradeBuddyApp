@@ -14,16 +14,21 @@ class SettingsController {
   static final _balanceSubject = BehaviorSubject<num>();
   static num _balance;
 
-  ///streams the current balance
+  ///streams the current account
   static Stream<String> get currentAccountStream =>
       _currentAccountSubject.stream;
   static final _currentAccountSubject = BehaviorSubject<String>();
   static String _currentAccount;
 
-  ///streams the current balance
+  ///streams the accounts
   static Stream<Map> get accountsStream => _accountsSubject.stream;
   static final _accountsSubject = BehaviorSubject<Map>();
   static Map _accounts;
+
+  ///streams the accounts
+  static Stream<Map> get strategiesStream => _strategiesSubject.stream;
+  static final _strategiesSubject = BehaviorSubject<Map>();
+  static Map _strategies;
 
   ///The function initializes the controller
   static Future<void> initialize() async {
@@ -41,16 +46,12 @@ class SettingsController {
       currentAccount = snapshot.value["current_account"];
       if (currentAccount == null) {
         currentAccount = accounts.keys.first;
-        reference.update({
-          "current_account": currentAccount,
-        });
       }
 
-      //get balance for the current account
-      try {
+      //get balance and strategies for the current account
+      if (currentAccount != null) {
         balance = snapshot.value["accounts"][currentAccount]["balance"];
-      } catch (error) {
-        balance = 10000;
+        strategies = snapshot.value["accounts"][currentAccount]["strategies"];
       }
 
       print("AnalyticsController.initialize(): balance = $balance, "
@@ -64,30 +65,20 @@ class SettingsController {
           accounts = event.snapshot.value;
           if (currentAccount == null && accounts != null) {
             currentAccount = accounts.keys.first;
-            reference.update({
-              "current_account": currentAccount,
-            });
-            try {
-              balance = snapshot.value["accounts"][currentAccount]["balance"];
-            } catch (error) {
-              balance = 10000;
-            }
+            balance = snapshot.value["accounts"][currentAccount]["balance"];
             TradesController.initialize();
           }
-          print("AnalyticsController.initialize(): balance = $balanceStream, "
+          print("AnalyticsController.initialize(): balance = $balance, "
               "accounts = $accounts, currentAccount = $currentAccount");
           break;
         case "current_account":
           var snapshot =
               await reference.child("accounts/$currentAccount").once();
           if (snapshot.value == null) return;
-          try {
-            balance = snapshot.value["accounts"][currentAccount]["balance"];
-          } catch (error) {
-            balance = 10000;
-          }
+          balance = snapshot.value["balance"];
+          strategies = snapshot.value["strategies"];
           TradesController.initialize();
-          print("AnalyticsController.initialize(): balance = $balanceStream, "
+          print("AnalyticsController.initialize(): balance = $balance, "
               "accounts = $accounts, currentAccount = $currentAccount");
           break;
       }
@@ -95,13 +86,37 @@ class SettingsController {
   }
 
   static Map get accounts => _accounts;
+
   static set accounts(Map value) {
     print("accounts = $value");
     _accounts = value;
     _accountsSubject.add(value);
   }
 
+  static Map get strategies => _strategies;
+
+  static set strategies(Map value) {
+    print("strategies = $value");
+    _strategies = value ?? Map();
+    _strategiesSubject.add(_strategies);
+  }
+
+  static addStrategiy(Map<String, dynamic> value) {
+    print("addStrategie = $value");
+    _strategies.addAll(value);
+    _strategiesSubject.add(_strategies);
+    reference.child("accounts/$currentAccount/strategies").update(value);
+  }
+
+  static removeStrategiy(String value) {
+    print("removeStrategie = $value");
+    _strategies.remove(value);
+    _strategiesSubject.add(_strategies);
+    reference.child("accounts/$currentAccount/strategies/$value").remove();
+  }
+
   static String get currentAccount => _currentAccount;
+
   static set currentAccount(String value) {
     print("currentAccount = $value");
     _currentAccount = value;
@@ -112,11 +127,12 @@ class SettingsController {
   }
 
   static num get balance => _balance;
+
   static set balance(num value) {
     print("balance = $value");
     _balance = value;
     _balanceSubject.add(value);
-    reference.child("accounts/${currentAccount}").update({
+    reference.child("accounts/$currentAccount").update({
       "balance": value,
     });
   }

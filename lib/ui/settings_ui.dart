@@ -50,6 +50,16 @@ class _SettingsState extends State<Settings> {
         ),
         Divider(height: 1.0),
         ListTile(
+          leading: Icon(Icons.build),
+          title: Text("Strategies"),
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) => _showStrategiesDialog());
+          },
+        ),
+        Divider(height: 1.0),
+        ListTile(
           leading: Icon(Icons.help_outline),
           title: Text("Instruction"),
           onTap: () {
@@ -83,7 +93,7 @@ class _SettingsState extends State<Settings> {
 
   AlertDialog _showAccountsDialog() {
     return AlertDialog(
-      title: Text("Choose Account"),
+      title: Text("Accounts"),
       content: SingleChildScrollView(
         child: Column(
           children: SettingsController.accounts?.keys?.map((account) {
@@ -120,7 +130,7 @@ class _SettingsState extends State<Settings> {
     final TextEditingController _textController = TextEditingController();
 
     return AlertDialog(
-      title: Text("Set Starting Balance"),
+      title: Text("Starting Balance"),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -163,6 +173,109 @@ class _SettingsState extends State<Settings> {
     );
   }
 
+  AlertDialog _showStrategiesDialog() {
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    final TextEditingController _controllerStrategie = TextEditingController();
+    final TextEditingController _controllerAbbreviation =
+        TextEditingController();
+
+    return AlertDialog(
+      title: Text("Strategies"),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            StreamBuilder(
+              initialData: SettingsController.strategies,
+              stream: SettingsController.strategiesStream,
+              builder: (BuildContext context, AsyncSnapshot<Map> snapshot) =>
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: snapshot.data?.keys?.map((strategy) {
+                          return Dismissible(
+                            key: Key(strategy),
+                            onDismissed: (direction) =>
+                                SettingsController.removeStrategiy(strategy),
+                            child: FlatButton(
+                              child:
+                                  Text("$strategy,${snapshot.data[strategy]}"),
+                              onPressed: () {},
+                            ),
+                          );
+                        })?.toList() ??
+                        [
+                          Container(
+                            height: 0.0,
+                            width: 0.0,
+                          )
+                        ],
+                  ),
+            ),
+            Form(
+              key: _formKey,
+              child: Row(children: <Widget>[
+                Flexible(
+                    flex: 5,
+                    child: TextFormField(
+                      maxLines: 1,
+                      controller: _controllerStrategie,
+                      validator: (text) {
+                        if (text.length < 3) {
+                          return "Please enter a strategy";
+                        }
+                      },
+                    )),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 1.0),
+                ),
+                Flexible(
+                    flex: 2,
+                    child: TextFormField(
+                      maxLines: 1,
+                      controller: _controllerAbbreviation,
+                      validator: (text) {
+                        if (text.length < 3) {
+                          return "Please enter a abbreviation";
+                        }
+                      },
+                    )),
+                Flexible(
+                  flex: 1,
+                  child: FlatButton(
+                    padding: const EdgeInsets.symmetric(horizontal: 0.1),
+                    child: Icon(Icons.add_circle_outline),
+                    onPressed: () {
+                      if (_formKey.currentState.validate()) {
+                        SettingsController.addStrategiy({
+                          _controllerStrategie.text:
+                              _controllerAbbreviation.text
+                        });
+                        _controllerStrategie.clear();
+                        _controllerAbbreviation.clear();
+                      }
+                    },
+                  ),
+                )
+              ]),
+            ),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text("Confirm"),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        FlatButton(
+          child: Text("Cancel"),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
+    );
+  }
+
   AlertDialog _showLogoutDialog() {
     return AlertDialog(
       title: Text("Logout"),
@@ -170,8 +283,7 @@ class _SettingsState extends State<Settings> {
       actions: <Widget>[
         FlatButton(
           child: Text(
-            "Yes",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            "Confirm",
           ),
           onPressed: () {
             Auth.signOut().then((b) {
@@ -190,7 +302,6 @@ class _SettingsState extends State<Settings> {
         FlatButton(
           child: Text(
             "Cancel",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
           onPressed: () => Navigator.pop(context),
         ),
