@@ -38,7 +38,9 @@ class SettingsController {
 
     //get initial settings
     var snapshot = await reference.once();
-    if (snapshot.value != null && snapshot.value["accounts"] != "initialized") {
+    if (snapshot.value != null &&
+        snapshot.value["accounts"] != null &&
+        snapshot.value["accounts"] != "initialized") {
       //get all accounts
       accounts = snapshot.value["accounts"];
 
