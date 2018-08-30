@@ -1,10 +1,10 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
-import 'package:trade_buddy/ui/trades/commentary_dialog.dart';
-import 'package:trade_buddy/ui/trades/screenshot_dialog.dart';
+import 'package:trade_buddy/ui/trades/trades_commentary_dialog.dart';
+import 'package:trade_buddy/ui/trades/trades_screenshot_dialog.dart';
 import 'package:trade_buddy/utils/trade_model.dart';
 import 'package:trade_buddy/utils/trades_controller.dart';
-import 'package:trade_buddy/ui/trades/strategy_dialog.dart';
+import 'package:trade_buddy/ui/trades/trades_strategy_dialog.dart';
 
 class Trades extends StatefulWidget {
   @override

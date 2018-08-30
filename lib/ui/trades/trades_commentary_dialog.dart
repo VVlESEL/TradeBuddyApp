@@ -1,23 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:trade_buddy/utils/trade_model.dart';
 
-class CommentaryDialog extends StatefulWidget {
+class CommentaryDialog extends StatelessWidget {
   final Trade trade;
-  CommentaryDialog(this.trade);
+  CommentaryDialog(this.trade) {
+    _controller.text = trade.commentary;
+  }
 
-  @override
-  _CommentaryDialogState createState() => _CommentaryDialogState();
-}
-
-class _CommentaryDialogState extends State<CommentaryDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey();
   final TextEditingController _controller = TextEditingController();
-
-  @override
-  initState(){
-    super.initState();
-    _controller.text = widget.trade.commentary;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +31,7 @@ class _CommentaryDialogState extends State<CommentaryDialog> {
           child: Text("Update Commentary"),
           onPressed: () {
             if (_formKey.currentState.validate()) {
-              widget.trade.setCommentary(_controller.text);
+              trade.setCommentary(_controller.text);
               Navigator.pop(context);
             }
           },

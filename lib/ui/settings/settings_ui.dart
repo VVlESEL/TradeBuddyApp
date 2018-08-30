@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:trade_buddy/ui/instruction_ui.dart';
 import 'package:trade_buddy/ui/legal/legal_ui.dart';
-import 'package:trade_buddy/ui/settings/settings_dialogs.dart';
+import 'package:trade_buddy/ui/settings/settings_accounts_dialog.dart';
+import 'package:trade_buddy/ui/settings/settings_balance_dialog.dart';
+import 'package:trade_buddy/ui/settings/settings_logout_dialog.dart';
+import 'package:trade_buddy/ui/settings/settings_strategies_dialog.dart';
 import 'package:trade_buddy/utils/auth.dart';
 import 'package:trade_buddy/utils/settings_controller.dart';
 
@@ -27,7 +30,7 @@ class _SettingsState extends State<Settings> {
             if (SettingsController.currentAccount == null) return;
             await showDialog(
                 context: context,
-                builder: (BuildContext context) => showAccountsDialog(context));
+                builder: (BuildContext context) => AccountsDialog());
             setState(() {});
           },
         ),
@@ -44,7 +47,7 @@ class _SettingsState extends State<Settings> {
             if (SettingsController.balance == null) return;
             await showDialog(
                 context: context,
-                builder: (BuildContext context) => showBalanceDialog(context));
+                builder: (BuildContext context) => BalanceDialog());
             setState(() {});
           },
         ),
@@ -56,8 +59,7 @@ class _SettingsState extends State<Settings> {
             if (SettingsController.currentAccount == null) return;
             showDialog(
                 context: context,
-                builder: (BuildContext context) =>
-                    showStrategiesDialog(context));
+                builder: (BuildContext context) => StrategiesDialog());
           },
         ),
         Divider(height: 1.0),
@@ -86,7 +88,7 @@ class _SettingsState extends State<Settings> {
             onTap: () {
               showDialog(
                   context: context,
-                  builder: (BuildContext context) => showLogoutDialog(context));
+                  builder: (BuildContext context) => LogoutDialog());
             }),
         Divider(height: 1.0),
       ],

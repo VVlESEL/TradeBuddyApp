@@ -100,7 +100,7 @@ class SettingsController {
 
   static set strategies(Map value) {
     print("strategies = $value");
-    if(strategies == value) return;
+    if(strategies == value && value != null) return;
     _strategies = value ?? Map();
     _strategiesSubject.add(_strategies);
   }
