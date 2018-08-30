@@ -1,3 +1,9 @@
+import 'dart:async';
+
+import 'package:firebase_database/firebase_database.dart';
+import 'package:trade_buddy/utils/auth.dart';
+import 'package:trade_buddy/utils/settings_controller.dart';
+
 class Trade implements Comparable {
   num id;
   String symbol;
@@ -14,6 +20,11 @@ class Trade implements Comparable {
   num stoploss;
   String commentary;
 
+  String strategy;
+  String screenshotPath;
+
+  DatabaseReference reference;
+
   Trade.fromJson(String id, Map data) {
     this.id = int.tryParse(id) ?? 0;
     this.symbol = data["symbol"];
@@ -29,6 +40,12 @@ class Trade implements Comparable {
     this.takeprofit = data["takeprofit"];
     this.stoploss = data["stoploss"];
     this.commentary = data["commentary"];
+    this.strategy = data["strategy"] ?? null;
+
+    this.reference = FirebaseDatabase.instance
+        .reference()
+        .child("user/${Auth.user.uid}/trades/${SettingsController
+        .currentAccount}/$id");
   }
 
   @override
@@ -44,9 +61,40 @@ class Trade implements Comparable {
 
   @override
   String toString() {
-    return 'Trade{_id: $id, _symbol: $symbol, _lots: $lots, _type: $type, _openprice: $openprice, _opentime: $opentime, _closeprice: $closeprice, _closetime: $closetime, _commission: $commission, _swap: $swap, _profit: $profit, _takeprofit: $takeprofit, _stoploss: $stoploss, _commentary: $commentary}';
+    return 'Trade{id: $id, symbol: $symbol, lots: $lots, type: $type, '
+        'openprice: $openprice, opentime: $opentime, closeprice: $closeprice, '
+        'closetime: $closetime, commission: $commission, swap: $swap, '
+        'profit: $profit, takeprofit: $takeprofit, stoploss: $stoploss, '
+        'commentary: $commentary, strategy: $strategy, screenshotPath: $screenshotPath}';
   }
 
   @override
   int get hashCode => super.hashCode;
+
+  Future<void> setScreenshotPath(String value) async {
+    print("screenshotPath = $value");
+    if(screenshotPath == value) return;
+    screenshotPath = value;
+    await reference.update({
+      "screenshotPath": value,
+    });
+  }
+
+  Future<void> setCommentary(String value) async {
+    print("screenshotPath = $value");
+    if(commentary == value) return;
+    commentary = value;
+    await reference.update({
+      "commentary": value,
+    });
+  }
+
+  Future<void> setStrategy(String value) async {
+    print("strategy = $value");
+    if(strategy == value) return;
+    strategy = value;
+    await reference.update({
+      "strategy": value,
+    });
+  }
 }

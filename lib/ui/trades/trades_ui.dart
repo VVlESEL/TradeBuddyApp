@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:trade_buddy/utils/trade_model.dart';
 import 'package:trade_buddy/utils/trades_controller.dart';
+import 'package:trade_buddy/ui/trades/trades_dialogs.dart';
 
 class Trades extends StatefulWidget {
   @override
@@ -17,12 +18,12 @@ class _TradesState extends State<Trades> {
         stream: TradesController.tradesStream,
         initialData: UnmodifiableListView<Trade>([]),
         builder: (context, snapshot) => ListView(
-          children: snapshot.data
-              .map((trade) => TradeTile(
-            trade: trade,
-          ))
-              .toList(),
-        ),
+              children: snapshot.data
+                  .map((trade) => TradeTile(
+                        trade: trade,
+                      ))
+                  .toList(),
+            ),
       ),
     );
   }
@@ -89,14 +90,9 @@ class _TradeTileState extends State<TradeTile> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Text("${widget.trade.opentime}, "),
-                      Text(widget.trade.commentary),
-                    ],
-                  ),
+                  Text("${widget.trade.opentime}, ${widget.trade.commentary}"),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -121,7 +117,7 @@ class _TradeTileState extends State<TradeTile> {
                         children: <Widget>[
                           Text("Swap:"),
                           Text("Commission:"),
-                          Text(""),
+                          Text("Strategy:"),
                         ],
                       ),
                       Column(
@@ -129,18 +125,52 @@ class _TradeTileState extends State<TradeTile> {
                         children: <Widget>[
                           Text("${widget.trade.swap}"),
                           Text("${widget.trade.commission}"),
-                          Text(""),
+                          Text("${widget.trade.strategy ?? ""}"),
                         ],
                       ),
                     ],
                   )
                 ],
               ),
-            )
+            ),
+            Divider(height: 1.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                FlatButton(
+                  child: Icon(Icons.camera_alt),
+                  onPressed: () async {
+                    /*
+                    await showDialog(
+                        context: context,
+                        builder: (BuildContext context) => _showScreenshotDialog());
+                    */
+                    this.setState(() {});
+                  },
+                ),
+                FlatButton(
+                  child: Icon(Icons.mode_edit),
+                  onPressed: () async {
+                    await showDialog(
+                        context: context,
+                        builder: (BuildContext context) =>
+                            showCommentaryDialog(context, widget.trade));
+                    this.setState(() {});
+                  },
+                ),
+                FlatButton(
+                  child: Icon(Icons.build),
+                  onPressed: () async {
+                    await showDialog(
+                        context: context,
+                        builder: (BuildContext context) =>
+                            showStrategiesDialog(context, widget.trade));
+                    this.setState(() {});
+                  },
+                ),
+              ],
+            ),
           ],
-        ),
-        Divider(
-          height: 1.0,
         ),
       ],
     );

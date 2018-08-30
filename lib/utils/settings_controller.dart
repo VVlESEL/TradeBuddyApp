@@ -91,6 +91,7 @@ class SettingsController {
 
   static set accounts(Map value) {
     print("accounts = $value");
+    if(accounts == value) return;
     _accounts = value;
     _accountsSubject.add(value);
   }
@@ -99,6 +100,7 @@ class SettingsController {
 
   static set strategies(Map value) {
     print("strategies = $value");
+    if(strategies == value) return;
     _strategies = value ?? Map();
     _strategiesSubject.add(_strategies);
   }
@@ -121,6 +123,7 @@ class SettingsController {
 
   static set currentAccount(String value) {
     print("currentAccount = $value");
+    if(currentAccount == value) return;
     _currentAccount = value;
     _currentAccountSubject.add(value);
     reference.update({
@@ -132,6 +135,7 @@ class SettingsController {
 
   static set balance(num value) {
     print("balance = $value");
+    if(balance == value) return;
     _balance = value;
     _balanceSubject.add(value);
     reference.child("accounts/$currentAccount").update({

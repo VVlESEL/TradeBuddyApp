@@ -19,9 +19,9 @@ class TradesController {
 
   ///The function initializes the controller
   static Future<void> initialize() async {
-    if(SettingsController.currentAccount == null) return;
-
     var currentAccount = SettingsController.currentAccount;
+    if(currentAccount == null) return;
+
     reference = FirebaseDatabase.instance.reference().child(
         "user/${Auth.user.uid}/trades/$currentAccount");
 
