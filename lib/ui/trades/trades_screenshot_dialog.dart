@@ -46,14 +46,14 @@ class _ScreenshotDialogState extends State<Screenshot> {
           ? Center(child: CircularProgressIndicator())
           : (widget.trade.screenshotPath != null
               ? PhotoView(
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                      imageProvider: NetworkImage(widget.trade.screenshotPath))
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  imageProvider: NetworkImage(widget.trade.screenshotPath))
               : Container()),
       bottomNavigationBar: BottomNavigationBar(
           onTap: (item) async {
-            setState(() => _isLoading = true);
             _imageFile = await ImagePicker.pickImage(
                 source: item == 0 ? ImageSource.camera : ImageSource.gallery);
+            setState(() => _isLoading = true);
             if (_imageFile != null) await _uploadFile();
             setState(() => _isLoading = false);
           },
