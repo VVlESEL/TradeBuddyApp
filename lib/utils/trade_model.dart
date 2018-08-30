@@ -41,6 +41,7 @@ class Trade implements Comparable {
     this.stoploss = data["stoploss"];
     this.commentary = data["commentary"];
     this.strategy = data["strategy"] ?? null;
+    this.screenshotPath = data["screenshot_path"] ?? null;
 
     this.reference = FirebaseDatabase.instance
         .reference()
@@ -76,12 +77,12 @@ class Trade implements Comparable {
     if(screenshotPath == value) return;
     screenshotPath = value;
     await reference.update({
-      "screenshotPath": value,
+      "screenshot_path": value,
     });
   }
 
   Future<void> setCommentary(String value) async {
-    print("screenshotPath = $value");
+    print("commentary = $value");
     if(commentary == value) return;
     commentary = value;
     await reference.update({

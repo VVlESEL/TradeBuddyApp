@@ -1,8 +1,10 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
+import 'package:trade_buddy/ui/trades/commentary_dialog.dart';
+import 'package:trade_buddy/ui/trades/screenshot_dialog.dart';
 import 'package:trade_buddy/utils/trade_model.dart';
 import 'package:trade_buddy/utils/trades_controller.dart';
-import 'package:trade_buddy/ui/trades/trades_dialogs.dart';
+import 'package:trade_buddy/ui/trades/strategy_dialog.dart';
 
 class Trades extends StatefulWidget {
   @override
@@ -138,23 +140,19 @@ class _TradeTileState extends State<TradeTile> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 FlatButton(
-                  child: Icon(Icons.camera_alt),
-                  onPressed: () async {
-                    /*
-                    await showDialog(
-                        context: context,
-                        builder: (BuildContext context) => _showScreenshotDialog());
-                    */
-                    this.setState(() {});
-                  },
-                ),
+                    child: Icon(Icons.camera_alt),
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                Screenshot(widget.trade)))),
                 FlatButton(
                   child: Icon(Icons.mode_edit),
                   onPressed: () async {
                     await showDialog(
                         context: context,
                         builder: (BuildContext context) =>
-                            showCommentaryDialog(context, widget.trade));
+                            CommentaryDialog(widget.trade));
                     this.setState(() {});
                   },
                 ),
@@ -164,7 +162,7 @@ class _TradeTileState extends State<TradeTile> {
                     await showDialog(
                         context: context,
                         builder: (BuildContext context) =>
-                            showStrategiesDialog(context, widget.trade));
+                            StrategyDialog(widget.trade));
                     this.setState(() {});
                   },
                 ),
