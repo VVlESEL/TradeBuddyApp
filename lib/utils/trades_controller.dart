@@ -6,6 +6,7 @@ import 'package:trade_buddy/utils/trade_model.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:trade_buddy/utils/auth.dart';
 
+///static class that holds all the trades
 class TradesController {
   static DatabaseReference reference;
   static final List<Trade> trades = List();
@@ -47,7 +48,7 @@ class TradesController {
     });
   }
 
-  ///The function updates all trades in the db that meet the filter criteria
+  ///The function updates all trades in the db
   static Future<void> updateTrades() async {
     _isLoadingSubject.add(true);
     DataSnapshot dbTrades = await reference.orderByChild("closetime").once();
@@ -67,10 +68,14 @@ class TradesController {
   ///The function adds a single trade that meets the filter criteria to the list
   static bool addTrade(Trade trade) {
     //check if the trade meets the filter criteria
+    checkFilter(trade);
+    //add trade to the list
     if(!trades.contains(trade)) trades.add(trade);
     return true;
   }
 
   ///The function checks if a trade meets the filter criteria
-//bool checkTrade(Trade trade){ ... }
+  static bool checkFilter(Trade trade){
+    return true;
+  }
 }

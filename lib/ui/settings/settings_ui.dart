@@ -5,6 +5,7 @@ import 'package:trade_buddy/ui/settings/settings_accounts_dialog.dart';
 import 'package:trade_buddy/ui/settings/settings_balance_dialog.dart';
 import 'package:trade_buddy/ui/settings/settings_logout_dialog.dart';
 import 'package:trade_buddy/ui/settings/settings_strategies_dialog.dart';
+import 'package:trade_buddy/ui/settings/settings_symbols_dialog.dart';
 import 'package:trade_buddy/utils/auth.dart';
 import 'package:trade_buddy/utils/settings_controller.dart';
 
@@ -60,6 +61,17 @@ class _SettingsState extends State<Settings> {
             showDialog(
                 context: context,
                 builder: (BuildContext context) => StrategiesDialog());
+          },
+        ),
+        Divider(height: 1.0),
+        ListTile(
+          leading: Icon(Icons.filter_none),
+          title: Text("Symbols"),
+          onTap: () {
+            if (SettingsController.currentAccount == null) return;
+            showDialog(
+                context: context,
+                builder: (BuildContext context) => SymbolsDialog());
           },
         ),
         Divider(height: 1.0),

@@ -1,13 +1,15 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:trade_buddy/utils/auth.dart';
+import 'package:trade_buddy/utils/filter_controller.dart';
 import 'dart:async';
 
 import 'package:trade_buddy/utils/trades_controller.dart';
 
+///static class that holds all necessary settings
 class SettingsController {
   //get a reference to the trades db entry of the user
-  static DatabaseReference reference;
+  static DatabaseReference _reference;
 
   ///streams the current balance
   static Stream<num> get balanceStream => _balanceSubject.stream;
@@ -25,82 +27,90 @@ class SettingsController {
   static final _accountsSubject = BehaviorSubject<Map>();
   static Map _accounts;
 
-  ///streams the accounts
+  ///streams the strategies of the current account
   static Stream<Map> get strategiesStream => _strategiesSubject.stream;
   static final _strategiesSubject = BehaviorSubject<Map>();
   static Map _strategies;
 
+  ///streams the symbols of the current account
+  static Stream<Map> get symbolsStream => _symbolsSubject.stream;
+  static final _symbolsSubject = BehaviorSubject<Map>();
+  static Map _symbols;
+
   ///The function initializes the controller
   static Future<void> initialize() async {
-    reference = FirebaseDatabase.instance
+    _reference = FirebaseDatabase.instance
         .reference()
         .child("user/${Auth.user.uid}/settings");
 
-    //get initial settings
-    var snapshot = await reference.once();
-    if (snapshot.value != null &&
-        snapshot.value["accounts"] != null &&
-        snapshot.value["accounts"] != "initialized") {
-      //get all accounts
-      accounts = snapshot.value["accounts"];
+    //add a listener for new child and child changes
+    _reference.onChildAdded.listen((event) => fetchSettingsFromDb(event));
+    _reference.onChildChanged.listen((event) => fetchSettingsFromDb(event));
+  }
 
-      //get current account
-      currentAccount = snapshot.value["current_account"];
-      if (currentAccount == null) {
-        currentAccount = accounts.keys.first;
-      }
-
-      //get balance and strategies for the current account
-      if (currentAccount != null) {
-        balance = snapshot.value["accounts"][currentAccount]["balance"];
-        strategies = snapshot.value["accounts"][currentAccount]["strategies"];
-      }
-
-      print("AnalyticsController.initialize(): balance = $balance, "
-          "accounts = $accounts, currentAccount = $currentAccount");
+  static fetchSettingsFromDb(Event event) async {
+    switch (event.snapshot.key) {
+      case "accounts":
+        accounts = event.snapshot.value;
+        currentAccount = (await _reference.child("current_account").once()).value;
+        if (currentAccount == null && accounts != null) {
+          currentAccount = accounts.keys.first;
+        }
+        break;
     }
-
-    //add a listener for new child and check if it meets the filter criteria
-    reference.onChildChanged.listen((event) async {
-      switch (event.snapshot.key) {
-        case "accounts":
-          accounts = event.snapshot.value;
-          if (currentAccount == null && accounts != null) {
-            currentAccount = accounts.keys.first;
-            balance = snapshot.value["accounts"][currentAccount]["balance"];
-            TradesController.initialize();
-          }
-          print("AnalyticsController.initialize(): balance = $balance, "
-              "accounts = $accounts, currentAccount = $currentAccount");
-          break;
-        case "current_account":
-          var snapshot =
-              await reference.child("accounts/$currentAccount").once();
-          if (snapshot.value == null) return;
-          balance = snapshot.value["balance"];
-          strategies = snapshot.value["strategies"];
-          TradesController.initialize();
-          print("AnalyticsController.initialize(): balance = $balance, "
-              "accounts = $accounts, currentAccount = $currentAccount");
-          break;
-      }
-    });
   }
 
   static Map get accounts => _accounts;
 
   static set accounts(Map value) {
     print("accounts = $value");
-    if(accounts == value) return;
+    if (accounts == value) return;
     _accounts = value;
     _accountsSubject.add(value);
+  }
+
+  static String get currentAccount => _currentAccount;
+
+  static set currentAccount(String value) {
+    print("currentAccount = $value");
+    if (currentAccount == value) return;
+    _currentAccount = value;
+    _currentAccountSubject.add(value);
+    _reference.update({
+      "current_account": value,
+    });
+    fetchCurrentAccountData();
+  }
+
+  static Future<void> fetchCurrentAccountData() async {
+    var snapshot = await _reference.child("accounts/$currentAccount").once();
+    if (snapshot.value == null) return;
+    balance = snapshot.value["balance"];
+    strategies = snapshot.value["strategies"];
+    symbols = snapshot.value["symbols"];
+    //initialize filter controller
+    await FilterController.initialize();
+    //initialize trades controller
+    TradesController.initialize();
+  }
+
+  static num get balance => _balance;
+
+  static set balance(num value) {
+    print("balance = $value");
+    if (balance == value) return;
+    _balance = value;
+    _balanceSubject.add(value);
+    _reference.child("accounts/$currentAccount").update({
+      "balance": value,
+    });
   }
 
   static Map get strategies => _strategies;
 
   static set strategies(Map value) {
     print("strategies = $value");
-    if(strategies == value && value != null) return;
+    if (strategies == value && value != null) return;
     _strategies = value ?? Map();
     _strategiesSubject.add(_strategies);
   }
@@ -109,37 +119,36 @@ class SettingsController {
     print("addStrategie = $value");
     _strategies.addAll(value);
     _strategiesSubject.add(_strategies);
-    reference.child("accounts/$currentAccount/strategies").update(value);
+    _reference.child("accounts/$currentAccount/strategies").update(value);
   }
 
   static removeStrategiy(String value) {
     print("removeStrategie = $value");
     _strategies.remove(value);
     _strategiesSubject.add(_strategies);
-    reference.child("accounts/$currentAccount/strategies/$value").remove();
+    _reference.child("accounts/$currentAccount/strategies/$value").remove();
   }
 
-  static String get currentAccount => _currentAccount;
+  static Map get symbols => _symbols;
 
-  static set currentAccount(String value) {
-    print("currentAccount = $value");
-    if(currentAccount == value) return;
-    _currentAccount = value;
-    _currentAccountSubject.add(value);
-    reference.update({
-      "current_account": value,
-    });
+  static set symbols(Map value) {
+    print("symbols = $value");
+    if (symbols == value && value != null) return;
+    _symbols = value ?? Map();
+    _symbolsSubject.add(_symbols);
   }
 
-  static num get balance => _balance;
+  static addSymbol(Map<String, dynamic> value) {
+    print("addSymbol = $value");
+    _symbols.addAll(value);
+    _symbolsSubject.add(_symbols);
+    _reference.child("accounts/$currentAccount/symbols").update(value);
+  }
 
-  static set balance(num value) {
-    print("balance = $value");
-    if(balance == value) return;
-    _balance = value;
-    _balanceSubject.add(value);
-    reference.child("accounts/$currentAccount").update({
-      "balance": value,
-    });
+  static removeSymbol(String value) {
+    print("removeSymbol = $value");
+    _symbols.remove(value);
+    _symbolsSubject.add(_symbols);
+    _reference.child("accounts/$currentAccount/symbols/$value").remove();
   }
 }
