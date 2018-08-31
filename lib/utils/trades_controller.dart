@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'package:rxdart/rxdart.dart';
+import 'package:trade_buddy/utils/filter_controller.dart';
 import 'package:trade_buddy/utils/settings_controller.dart';
 import 'package:trade_buddy/utils/trade_model.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -68,7 +69,7 @@ class TradesController {
   ///The function adds a single trade that meets the filter criteria to the list
   static bool addTrade(Trade trade) {
     //check if the trade meets the filter criteria
-    checkFilter(trade);
+    if(!checkFilter(trade)) return false;
     //add trade to the list
     if(!trades.contains(trade)) trades.add(trade);
     return true;
@@ -76,6 +77,10 @@ class TradesController {
 
   ///The function checks if a trade meets the filter criteria
   static bool checkFilter(Trade trade){
+    if(!FilterController.isSell && trade.type == "sell") return false;
+    if(!FilterController.isBuy && trade.type == "buy") return false;
+    //if(!FilterController.filteredSymbols.contains(trade.symbol)) return false;
+    //if(!FilterController.filteredStrategies.contains(trade.strategy)) return false;
     return true;
   }
 }
