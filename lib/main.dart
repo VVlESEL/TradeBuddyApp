@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:trade_buddy/ui/analytics/analytics_ui.dart';
+import 'package:trade_buddy/ui/filter_dialog.dart';
 import 'package:trade_buddy/ui/login_ui.dart';
 import 'package:trade_buddy/ui/settings/settings_ui.dart';
 import 'package:trade_buddy/ui/trades/trades_ui.dart';
 import 'package:trade_buddy/utils/auth.dart';
 import 'package:firebase_admob/firebase_admob.dart';
-import 'package:trade_buddy/utils/filter_controller.dart';
 import 'package:trade_buddy/utils/settings_controller.dart';
-import 'package:trade_buddy/utils/trades_controller.dart';
 import 'package:trade_buddy/utils/admob.dart';
 import 'dart:async';
 
@@ -72,6 +71,7 @@ class _TradeBuddyState extends State<TradeBuddy>
       Auth.checkSignIn().then((b) async {
         //get all the trades from the db and store them in the db
         if (b) {
+          //initializes the settings, filter, trades controller
           await SettingsController.initialize();
         }
 
@@ -113,17 +113,33 @@ class _TradeBuddyState extends State<TradeBuddy>
                     ],
                   ),
                   actions: <Widget>[
-                    FlatButton(
-                      child: AnimatedStar(
-                        controller: _animationController,
-                      ),
-                      onPressed: () => createInterstitialAd()
-                        ..load()
-                        ..show(
-                          anchorType: AnchorType.top,
-                          anchorOffset: 100.0,
+                    Container(
+                      width: 60.0,
+                      child: FlatButton(
+                        child: Icon(
+                          Icons.filter_list,
+                          color: Colors.white,
+                          size: 40.0,
                         ),
-                    )
+                        onPressed: () => showDialog(
+                            context: context,
+                            builder: (BuildContext context) => FilterDialog()),
+                      ),
+                    ),
+                    Container(
+                      width: 80.0,
+                      child: FlatButton(
+                        child: AnimatedStar(
+                          controller: _animationController,
+                        ),
+                        onPressed: () => createInterstitialAd()
+                          ..load()
+                          ..show(
+                            anchorType: AnchorType.top,
+                            anchorOffset: 100.0,
+                          ),
+                      ),
+                    ),
                   ],
                 ),
                 body: _getBody(),
@@ -156,6 +172,7 @@ class _TradeBuddyState extends State<TradeBuddy>
   Widget _getBody() {
     switch (_menuIndex) {
       case 0:
+        /*
         _bannerAd ??= createBannerAd()
           ..load().then((loaded) {
             if (loaded && this.mounted) {
@@ -166,6 +183,7 @@ class _TradeBuddyState extends State<TradeBuddy>
                 );
             }
           });
+          */
         return Trades();
       case 1:
         _bannerAd?.dispose()?.then((b) => _bannerAd = null);

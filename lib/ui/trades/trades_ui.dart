@@ -14,9 +14,9 @@ class Trades extends StatefulWidget {
 class _TradesState extends State<Trades> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return /*Padding(
       padding: const EdgeInsets.only(bottom: 60.0),
-      child: StreamBuilder<UnmodifiableListView<Trade>>(
+      child:*/ StreamBuilder<UnmodifiableListView<Trade>>(
         stream: TradesController.tradesStream,
         initialData: UnmodifiableListView<Trade>([]),
         builder: (context, snapshot) => ListView(
@@ -26,7 +26,7 @@ class _TradesState extends State<Trades> {
                       ))
                   .toList(),
             ),
-      ),
+//      ),
     );
   }
 }
