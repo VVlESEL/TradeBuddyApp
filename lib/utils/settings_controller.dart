@@ -89,9 +89,7 @@ class SettingsController {
     balance = snapshot.value["balance"];
     strategies = snapshot.value["strategies"];
     symbols = snapshot.value["symbols"];
-    //initialize filter controller
     await FilterController.initialize();
-    //initialize trades controller
     await TradesController.initialize();
   }
 
