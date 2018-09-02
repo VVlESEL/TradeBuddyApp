@@ -6,6 +6,7 @@ import 'package:trade_buddy/ui/settings/settings_ui.dart';
 import 'package:trade_buddy/ui/trades/trades_ui.dart';
 import 'package:trade_buddy/utils/auth.dart';
 import 'package:firebase_admob/firebase_admob.dart';
+import 'package:trade_buddy/utils/filter_controller.dart';
 import 'package:trade_buddy/utils/settings_controller.dart';
 import 'package:trade_buddy/utils/trades_controller.dart';
 import 'package:trade_buddy/utils/admob.dart';
