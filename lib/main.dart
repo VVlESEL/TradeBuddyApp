@@ -73,7 +73,6 @@ class _TradeBuddyState extends State<TradeBuddy>
         //get all the trades from the db and store them in the db
         if (b) {
           await SettingsController.initialize();
-          await TradesController.initialize();
         }
 
         //inform the ui that data is loaded

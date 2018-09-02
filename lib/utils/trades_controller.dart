@@ -16,16 +16,18 @@ class TradesController {
 
   ///streams the current list of trades
   static Stream<List<Trade>> get tradesStream => _tradesSubject.stream;
+
   ///streams if the controller is currently loading or deleting trades
   static Stream<bool> get isLoadingStream => _isLoadingSubject.stream;
 
   ///The function initializes the controller
   static Future<void> initialize() async {
     var currentAccount = SettingsController.currentAccount;
-    if(currentAccount == null) return;
+    if (currentAccount == null) return;
 
-    reference = FirebaseDatabase.instance.reference().child(
-        "user/${Auth.user.uid}/trades/$currentAccount");
+    reference = FirebaseDatabase.instance
+        .reference()
+        .child("user/${Auth.user.uid}/trades/$currentAccount");
 
     //reset trades list
     trades.clear();
@@ -69,18 +71,26 @@ class TradesController {
   ///The function adds a single trade that meets the filter criteria to the list
   static bool addTrade(Trade trade) {
     //check if the trade meets the filter criteria
-    if(!checkFilter(trade)) return false;
+    if (!checkFilter(trade)) return false;
     //add trade to the list
-    if(!trades.contains(trade)) trades.add(trade);
+    if (!trades.contains(trade)) trades.add(trade);
     return true;
   }
 
   ///The function checks if a trade meets the filter criteria
-  static bool checkFilter(Trade trade){
-    if(!FilterController.isSell && trade.type == "sell") return false;
-    if(!FilterController.isBuy && trade.type == "buy") return false;
-    //if(!FilterController.filteredSymbols.contains(trade.symbol)) return false;
-    //if(!FilterController.filteredStrategies.contains(trade.strategy)) return false;
+  static bool checkFilter(Trade trade) {
+    if (!(FilterController.filter["sell"] ?? false) && trade.type == "sell")
+      return false;
+    if (!(FilterController.filter["buy"] ?? false) && trade.type == "buy")
+      return false;
+    if ((FilterController.filter["symbols"] != null  ?? false) &&
+        !FilterController.filter["symbols"]["*"] &&
+            !FilterController.filter["symbols"][trade.symbol] ??
+        false) return false;
+    if ((FilterController.filter["strategies"] != null ?? false) &&
+        !FilterController.filter["strategies"]["*"] &&
+            !FilterController.filter["strategies"][trade.strategy] ??
+        false) return false;
     return true;
   }
 }

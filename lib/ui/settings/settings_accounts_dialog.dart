@@ -17,7 +17,7 @@ class AccountsDialog extends StatelessWidget {
               child: ListTile(
                 title: Text("$account"),
                 onTap: () {
-                  SettingsController.currentAccount = account;
+                  SettingsController.setCurrentAccount(account);
                   Navigator.pop(context);
                 },
               ),

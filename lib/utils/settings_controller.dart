@@ -52,9 +52,10 @@ class SettingsController {
     switch (event.snapshot.key) {
       case "accounts":
         accounts = event.snapshot.value;
-        currentAccount = (await _reference.child("current_account").once()).value;
+        setCurrentAccount(
+            (await _reference.child("current_account").once()).value);
         if (currentAccount == null && accounts != null) {
-          currentAccount = accounts.keys.first;
+          setCurrentAccount(accounts.keys.first);
         }
         break;
     }
@@ -71,7 +72,7 @@ class SettingsController {
 
   static String get currentAccount => _currentAccount;
 
-  static set currentAccount(String value) {
+  static setCurrentAccount(String value) async {
     print("currentAccount = $value");
     if (currentAccount == value) return;
     _currentAccount = value;
@@ -79,7 +80,7 @@ class SettingsController {
     _reference.update({
       "current_account": value,
     });
-    fetchCurrentAccountData();
+    await fetchCurrentAccountData();
   }
 
   static Future<void> fetchCurrentAccountData() async {
@@ -91,7 +92,7 @@ class SettingsController {
     //initialize filter controller
     await FilterController.initialize();
     //initialize trades controller
-    TradesController.initialize();
+    await TradesController.initialize();
   }
 
   static num get balance => _balance;
@@ -120,6 +121,7 @@ class SettingsController {
     _strategies.addAll(value);
     _strategiesSubject.add(_strategies);
     _reference.child("accounts/$currentAccount/strategies").update(value);
+    FilterController.initialize();
   }
 
   static removeStrategiy(String value) {
@@ -127,6 +129,7 @@ class SettingsController {
     _strategies.remove(value);
     _strategiesSubject.add(_strategies);
     _reference.child("accounts/$currentAccount/strategies/$value").remove();
+    FilterController.initialize();
   }
 
   static Map get symbols => _symbols;
@@ -143,6 +146,7 @@ class SettingsController {
     _symbols.addAll(value);
     _symbolsSubject.add(_symbols);
     _reference.child("accounts/$currentAccount/symbols").update(value);
+    FilterController.initialize();
   }
 
   static removeSymbol(String value) {
@@ -150,5 +154,6 @@ class SettingsController {
     _symbols.remove(value);
     _symbolsSubject.add(_symbols);
     _reference.child("accounts/$currentAccount/symbols/$value").remove();
+    FilterController.initialize();
   }
 }

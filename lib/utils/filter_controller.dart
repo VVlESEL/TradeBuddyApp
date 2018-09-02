@@ -7,10 +7,7 @@ import 'package:trade_buddy/utils/settings_controller.dart';
 ///static class that holds all the filter settings
 class FilterController {
   static DatabaseReference _reference;
-  static List _filteredStrategies;
-  static List _filteredSymbols;
-  static bool _isBuy;
-  static bool _isSell;
+  static DataSnapshot _filter;
 
   ///The function initializes the controller
   static Future<void> initialize() async {
@@ -21,62 +18,78 @@ class FilterController {
         "user/${Auth.user.uid}/settings/accounts/$currentAccount/filter");
 
     //get initial settings
-    var snapshot = await _reference.once();
-    bool hasData = snapshot.value != null;
-    //get all filtered settings for this account
-    filteredStrategies = hasData
-        ? snapshot.value["filtered_strategies"] ??
-            SettingsController.strategies.values.toList()
-        : SettingsController.strategies.values.toList();
-    filteredSymbols = hasData
-        ? snapshot.value["filtered_symbols"] ??
-            SettingsController.symbols.keys.toList()
-        : SettingsController.symbols.keys.toList();
-    isBuy = hasData ? snapshot.value["is_buy"] : true;
-    isSell = hasData ? snapshot.value["is_sell"] : true;
+    _filter = await _reference.once();
+
+    //update filter, compare to strategies/symbols of settings controller
+    await updateFilter();
+
+    //get initial settings
+    _filter = await _reference.once();
   }
 
-  static bool get isBuy => _isBuy;
+  static Map get filter => _filter.value;
 
-  static set isBuy(bool value) {
-    print("isBuy = $value");
-    if (isBuy == value) return;
-    _isBuy = value;
-    _reference.update({
-      "is_buy": value,
+  static Future<void> updateFilter() async {
+    //update buy and sell filter
+    if (filter == null || filter["buy"] == null)
+      _reference.update({
+        "buy": true,
+      });
+    if (filter == null || filter["sell"] == null)
+      _reference.update({
+        "sell": true,
+      });
+
+    //update strategies filter
+    if (filter == null ||
+        filter["strategies"] == null ||
+        filter["strategies"]["*"] == null) {
+      _reference.child("strategies").update({
+        "*": true,
+      });
+    }
+
+    SettingsController.strategies.values.forEach((strategy) {
+      if (filter == null ||
+          filter["strategies"] == null ||
+          filter["strategies"][strategy] == null)
+        _reference.child("strategies").update({
+          strategy: true,
+        });
     });
-  }
 
-  static bool get isSell => _isSell;
-
-  static set isSell(bool value) {
-    print("isSell = $value");
-    if (isSell == value) return;
-    _isSell = value;
-    _reference.update({
-      "is_sell": value,
+    filter["strategies"]?.forEach((k, v) {
+      if (k != "*" && !SettingsController.strategies.containsValue(k)) {
+        _reference.child("strategies").update({
+          k: null,
+        });
+      }
     });
-  }
 
-  static List get filteredStrategies => _filteredStrategies;
+    //update symbols filter
+    if (filter == null ||
+        filter["symbols"] == null ||
+        filter["symbols"]["*"] == null) {
+      _reference.child("symbols").update({
+        "*": true,
+      });
+    }
 
-  static set filteredStrategies(List value) {
-    print("filteredStrategies = $value");
-    if (filteredStrategies == value) return;
-    _filteredStrategies = value;
-    _reference.update({
-      "filtered_strategies": value,
+    SettingsController.symbols.keys.forEach((symbol) {
+      if (filter == null ||
+          filter["symbols"] == null ||
+          filter["symbols"][symbol] == null)
+        _reference.child("symbols").update({
+          symbol: true,
+        });
     });
-  }
 
-  static List get filteredSymbols => _filteredSymbols;
-
-  static set filteredSymbols(List value) {
-    print("filteredSymbols = $value");
-    if (filteredSymbols == value) return;
-    _filteredSymbols = value;
-    _reference.update({
-      "filtered_symbols": value,
+    filter["symbols"]?.forEach((k, v) {
+      if (k != "*" && !SettingsController.symbols.containsKey(k)) {
+        _reference.child("symbols").update({
+          k: null,
+        });
+      }
     });
   }
 }
