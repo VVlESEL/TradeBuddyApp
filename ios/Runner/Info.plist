@@ -21,9 +21,11 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>5</string>
+	<string>6</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>This is necessary to take a picture with your device camera </string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This is necessary to choose an image from your phone</string>
 	<key>UILaunchStoryboardName</key>
