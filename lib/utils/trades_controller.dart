@@ -83,14 +83,16 @@ class TradesController {
       return false;
     if (!(FilterController.filter["buy"] ?? false) && trade.type == "buy")
       return false;
-    if ((FilterController.filter["symbols"] != null  ?? false) &&
-        !FilterController.filter["symbols"]["*"] &&
-            !FilterController.filter["symbols"][trade.symbol] ??
-        false) return false;
-    if ((FilterController.filter["strategies"] != null ?? false) &&
-        !FilterController.filter["strategies"]["*"] &&
-            !FilterController.filter["strategies"][trade.strategy] ??
-        false) return false;
+
+    if ((FilterController.filter["symbols"] != null) &&
+        !(FilterController.filter["symbols"]["*"] ?? false) &&
+        !(FilterController.filter["symbols"][trade.symbol] ?? false))
+      return false;
+
+    if ((FilterController.filter["strategies"] != null) &&
+        !(FilterController.filter["strategies"]["*"] ?? false) &&
+        !(FilterController.filter["strategies"][trade.strategy] ?? false))
+      return false;
     return true;
   }
 }

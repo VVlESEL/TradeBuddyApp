@@ -52,10 +52,10 @@ class SettingsController {
     switch (event.snapshot.key) {
       case "accounts":
         accounts = event.snapshot.value;
-        setCurrentAccount(
+        await setCurrentAccount(
             (await _reference.child("current_account").once()).value);
         if (currentAccount == null && accounts != null) {
-          setCurrentAccount(accounts.keys.first);
+          await setCurrentAccount(accounts.keys.first);
         }
         break;
     }
@@ -77,7 +77,7 @@ class SettingsController {
     if (currentAccount == value) return;
     _currentAccount = value;
     _currentAccountSubject.add(value);
-    _reference.update({
+    await _reference.update({
       "current_account": value,
     });
     await fetchCurrentAccountData();
