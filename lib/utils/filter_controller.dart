@@ -106,26 +106,26 @@ class FilterController {
   static Future<void> updateGeneral({bool buy, bool sell}) async {
     //update buy and sell filter
     if (buy != null && filter != null) {
-      await _reference.update({
+      _reference.update({
         "buy": buy,
       });
     }
     if (sell != null && filter != null) {
-      await _reference.update({
+      _reference.update({
         "sell": sell,
       });
     }
   }
   static Future<void> updateStrategies(Map symbols) async {
     symbols.forEach((k,v) async {
-        await _reference.child("strategies").update({
+        _reference.child("strategies").update({
           k: v,
         });
     });
   }
   static Future<void> updateSymbols(Map strategies) async {
     strategies.forEach((k,v) async {
-      await _reference.child("symbols").update({
+      _reference.child("symbols").update({
         k: v,
       });
     });

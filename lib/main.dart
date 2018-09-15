@@ -69,6 +69,16 @@ class _TradeBuddyState extends State<TradeBuddy>
 
     if (!isLoaded) {
       Auth.checkSignIn().then((b) async {
+        //enable offline caching
+        FirebaseDatabase.instance.setPersistenceEnabled(true);
+        if (b) {
+          FirebaseDatabase.instance
+              .reference()
+              .child("user")
+              .child(Auth.user.uid)
+              .keepSynced(true);
+        }
+
         //get all the trades from the db and store them in the db
         if (b) {
           //initializes the settings, filter, trades controller
@@ -80,15 +90,6 @@ class _TradeBuddyState extends State<TradeBuddy>
           isSignedIn = b;
           isLoaded = true;
         });
-
-        //enable offline caching
-        FirebaseDatabase.instance.setPersistenceEnabled(true);
-        if (b) {
-          FirebaseDatabase.instance
-              .reference()
-              .child("user/${Auth.user.uid}/trades")
-              .keepSynced(true);
-        }
       });
     }
   }

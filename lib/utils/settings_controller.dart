@@ -44,14 +44,14 @@ class SettingsController {
         .child("user/${Auth.user.uid}/settings");
 
     //add a listener for new child and child changes
-    _reference.onChildAdded.listen((event) => fetchSettingsFromDb(event));
-    _reference.onChildChanged.listen((event) => fetchSettingsFromDb(event));
+    _reference.onChildAdded.listen((event) => fetchSettingsFromDb(event.snapshot));
+    _reference.onChildChanged.listen((event) => fetchSettingsFromDb(event.snapshot));
   }
 
-  static fetchSettingsFromDb(Event event) async {
-    switch (event.snapshot.key) {
+  static fetchSettingsFromDb(DataSnapshot snapshot) async {
+    switch (snapshot.key) {
       case "accounts":
-        accounts = event.snapshot.value;
+        accounts = snapshot.value;
         await setCurrentAccount(
             (await _reference.child("current_account").once()).value);
         if (currentAccount == null && accounts != null) {
@@ -77,7 +77,7 @@ class SettingsController {
     if (currentAccount == value) return;
     _currentAccount = value;
     _currentAccountSubject.add(value);
-    await _reference.update({
+    _reference.update({
       "current_account": value,
     });
     await fetchCurrentAccountData();
