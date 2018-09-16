@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:trade_buddy/utils/settings_controller.dart';
 
-class StrategiesDialog extends StatelessWidget {
+class StrategiesDialog extends StatefulWidget {
+  @override
+  _StrategiesDialogState createState() => _StrategiesDialogState();
+}
+
+class _StrategiesDialogState extends State<StrategiesDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _controllerStrategie = TextEditingController();
   final TextEditingController _controllerAbbreviation = TextEditingController();
@@ -22,29 +27,29 @@ class StrategiesDialog extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: SettingsController.strategies.length == 0
                           ? [
-                              Text("Register your first strategy for this "
-                                  "account below. Provide the full name of "
-                                  "the strategie in the left text field "
-                                  "and a short form in the right text field.")
-                            ]
+                        Text("Register your first strategy for this "
+                            "account below. Provide the full name of "
+                            "the strategie in the left text field "
+                            "and a short form in the right text field.")
+                      ]
                           : snapshot.data?.keys?.map((strategy) {
-                              return Dismissible(
-                                key: Key(strategy),
-                                onDismissed: (direction) => SettingsController
-                                    .removeStrategiy(strategy),
-                                child: Card(
-                                  elevation: 1.0,
-                                  child: Row(
-                                    children: <Widget>[
-                                      Text(
-                                        "$strategy,${snapshot.data[strategy]}",
-                                        style: TextStyle(fontSize: 18.0),
-                                      ),
-                                    ],
-                                  ),
+                        return Dismissible(
+                          key: Key(strategy),
+                          onDismissed: (direction) => SettingsController
+                              .removeStrategiy(strategy),
+                          child: Card(
+                            elevation: 1.0,
+                            child: Row(
+                              children: <Widget>[
+                                Text(
+                                  "$strategy,${snapshot.data[strategy]}",
+                                  style: TextStyle(fontSize: 18.0),
                                 ),
-                              );
-                            })?.toList()),
+                              ],
+                            ),
+                          ),
+                        );
+                      })?.toList()),
             ),
             Form(
               key: _formKey,
@@ -83,7 +88,7 @@ class StrategiesDialog extends StatelessWidget {
                       if (_formKey.currentState.validate()) {
                         SettingsController.addStrategiy({
                           _controllerStrategie.text:
-                              _controllerAbbreviation.text
+                          _controllerAbbreviation.text
                         });
                         _controllerStrategie.clear();
                         _controllerAbbreviation.clear();

@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:trade_buddy/utils/settings_controller.dart';
 
-class SymbolsDialog extends StatelessWidget {
+class SymbolsDialog extends StatefulWidget {
+  @override
+  _SymbolsDialogState createState() => _SymbolsDialogState();
+}
+
+class _SymbolsDialogState extends State<SymbolsDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _controllerSymbol = TextEditingController();
 

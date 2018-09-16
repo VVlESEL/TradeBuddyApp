@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:trade_buddy/utils/settings_controller.dart';
 
-class BalanceDialog extends StatelessWidget {
+class BalanceDialog extends StatefulWidget {
+  @override
+  _BalanceDialogState createState() => _BalanceDialogState();
+}
+
+class _BalanceDialogState extends State<BalanceDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _textController = TextEditingController();
 
