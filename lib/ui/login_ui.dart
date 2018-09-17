@@ -236,6 +236,9 @@ class _LoginState extends State<Login> {
                 return "Please enter a password with at least 6 characters";
               if (value != _controllerPassword2.text)
                 return "Please enter matching passwords";
+              if (!RegExp("^[a-zA-Z0-9_]*\$").hasMatch(value)) {
+                return "Please enter an alphanumeric password";
+              }
             },
             obscureText: true,
             decoration: InputDecoration(
@@ -257,6 +260,9 @@ class _LoginState extends State<Login> {
                 return "Please enter a password with at least 6 characters";
               if (value != _controllerPassword.text)
                 return "Please enter matching passwords";
+              if (!RegExp("^[a-zA-Z0-9_]*\$").hasMatch(value)) {
+                return "Please enter an alphanumeric password";
+              }
             },
             obscureText: true,
             decoration: InputDecoration(
