@@ -34,17 +34,13 @@ class Instruction extends StatelessWidget {
             style: TextStyle(fontSize: 20.0),
           ),
           Padding(padding: EdgeInsets.symmetric(vertical: 4.0)),
-          Text("To use the script it has to be able to send web requests."
+          Text("To use the script it has to be able to send web requests. "
               "In MT4 this has to be allowed first."
               "To do so follow these steps:"),
           Padding(padding: EdgeInsets.symmetric(vertical: 4.0)),
           Image.asset("images/instruction_options.png"),
           Divider(height: 50.0),
           Image.asset("images/instruction_expert_advisors.png"),
-          Padding(padding: EdgeInsets.symmetric(vertical: 4.0)),
-          Text("You have to add these two Urls:"
-              "\n\nhttps://us-central1-tradebuddy-f803c.cloudfunctions.net/loginUser"
-              "\n\nhttps://us-central1-tradebuddy-f803c.cloudfunctions.net/addTrade"),
           Padding(padding: EdgeInsets.symmetric(vertical: 4.0)),
           Text("Afterwards just double click on the TradeBuddyWeb script in "
               "the MT4 Navigator and enter your login credentials. The script "
