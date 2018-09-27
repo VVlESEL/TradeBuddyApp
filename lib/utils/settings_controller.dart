@@ -22,9 +22,9 @@ class SettingsController {
   static String _currentAccount;
 
   ///streams the accounts
-  static Stream<Map> get accountsStream => _accountsSubject.stream;
-  static final _accountsSubject = BehaviorSubject<Map>();
-  static Map _accounts;
+  static Stream<List> get accountsStream => _accountsSubject.stream;
+  static final _accountsSubject = BehaviorSubject<List>();
+  static List _accounts = [];
 
   ///streams the general filter of the current account
   static Stream<Map> get generalFilterStream => _generalFilterSubject.stream;
@@ -51,25 +51,19 @@ class SettingsController {
         (await _reference.child("settings/current_account").once()).value);
 
     //add a listener for new child
-    _reference.onChildAdded
-        .listen((event) => fetchSettingsFromDb(event.snapshot));
+    _reference.child("accounts").onChildAdded
+        .listen((event) async {
+      accounts.add(event.snapshot.key);
+      if (currentAccount == null && accounts != null) {
+        await setCurrentAccount(accounts.first);
+      }
+    });
   }
 
-  static fetchSettingsFromDb(DataSnapshot snapshot) async {
-    switch (snapshot.key) {
-      case "accounts":
-        accounts = snapshot.value;
-        if (currentAccount == null && accounts != null) {
-          await setCurrentAccount(accounts.keys.first);
-        }
-        break;
-    }
-  }
+  static List get accounts => _accounts;
 
-  static Map get accounts => _accounts;
-
-  static set accounts(Map value) {
-    print("accounts = ${value.keys}");
+  static set accounts(List value) {
+    print("accounts = $value");
     if (accounts == value) return;
     _accounts = value;
     _accountsSubject.add(value);

@@ -8,7 +8,7 @@ class AccountsDialog extends StatelessWidget {
       title: Text("Accounts"),
       content: SingleChildScrollView(
         child: Column(
-          children: SettingsController.accounts?.keys?.map((account) {
+          children: SettingsController.accounts?.map((account) {
             return Card(
               elevation: 1.0,
               color: SettingsController.currentAccount == account
