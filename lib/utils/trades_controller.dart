@@ -79,19 +79,25 @@ class TradesController {
 
   ///The function checks if a trade meets the filter criteria
   static bool checkFilter(Trade trade) {
-    if (!(FilterController.filter["sell"] ?? false) && trade.type == "sell")
-      return false;
-    if (!(FilterController.filter["buy"] ?? false) && trade.type == "buy")
+    if (SettingsController.generalFilter != null) {
+      if (!(SettingsController.generalFilter["sell"] ?? false) &&
+          trade.type == "sell") return false;
+      if (!(SettingsController.generalFilter["buy"] ?? false) &&
+          trade.type == "buy") return false;
+    }
+
+    if (SettingsController.symbols != null &&
+        SettingsController.symbols["*"] != null &&
+        !(SettingsController.symbols["*"]["filter"] ?? false) &&
+        (SettingsController.symbols[trade.symbol] == null ||
+        !(SettingsController.symbols[trade.symbol]["filter"] ?? false)))
       return false;
 
-    if ((FilterController.filter["symbols"] != null) &&
-        !(FilterController.filter["symbols"]["*"] ?? false) &&
-        !(FilterController.filter["symbols"][trade.symbol] ?? false))
-      return false;
-
-    if ((FilterController.filter["strategies"] != null) &&
-        !(FilterController.filter["strategies"]["*"] ?? false) &&
-        !(FilterController.filter["strategies"][trade.strategy] ?? false))
+    if (SettingsController.strategies != null &&
+        SettingsController.strategies["*"] != null &&
+        !(SettingsController.strategies["*"]["filter"] ?? false) &&
+        (SettingsController.strategies[trade.strategy] == null ||
+        !(SettingsController.strategies[trade.strategy]["filter"] ?? false)))
       return false;
     return true;
   }

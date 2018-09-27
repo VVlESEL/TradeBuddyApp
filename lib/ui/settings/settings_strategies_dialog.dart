@@ -25,31 +25,37 @@ class _StrategiesDialogState extends State<StrategiesDialog> {
               builder: (BuildContext context, AsyncSnapshot<Map> snapshot) =>
                   Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: SettingsController.strategies.length == 0
+                      children: SettingsController.strategies.length <= 1
                           ? [
-                        Text("Register your first strategy for this "
-                            "account below. Provide the full name of "
-                            "the strategie in the left text field "
-                            "and a short form in the right text field.")
-                      ]
+                              Text("Register your first strategy for this "
+                                  "account below. Provide the full name of "
+                                  "the strategie in the left text field "
+                                  "and a short form in the right text field.")
+                            ]
                           : snapshot.data?.keys?.map((strategy) {
-                        return Dismissible(
-                          key: Key(strategy),
-                          onDismissed: (direction) => SettingsController
-                              .removeStrategiy(strategy),
-                          child: Card(
-                            elevation: 1.0,
-                            child: Row(
-                              children: <Widget>[
-                                Text(
-                                  "$strategy,${snapshot.data[strategy]}",
-                                  style: TextStyle(fontSize: 18.0),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      })?.toList()),
+                              return strategy == "*"
+                                  ? Container(
+                                      width: 0.0,
+                                      height: 0.0,
+                                    )
+                                  : Dismissible(
+                                      key: Key(strategy),
+                                      onDismissed: (direction) =>
+                                          SettingsController.removeStrategy(
+                                              strategy),
+                                      child: Card(
+                                        elevation: 1.0,
+                                        child: Row(
+                                          children: <Widget>[
+                                            Text(
+                                              "$strategy, ${snapshot.data[strategy]["abbreviation"]}",
+                                              style: TextStyle(fontSize: 18.0),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                            })?.toList()),
             ),
             Form(
               key: _formKey,
@@ -86,10 +92,10 @@ class _StrategiesDialogState extends State<StrategiesDialog> {
                     child: Icon(Icons.add_circle_outline),
                     onPressed: () {
                       if (_formKey.currentState.validate()) {
-                        SettingsController.addStrategiy({
-                          _controllerStrategie.text:
-                          _controllerAbbreviation.text
-                        });
+                        SettingsController.addStrategy(
+                            _controllerStrategie.text,
+                            _controllerAbbreviation.text,
+                            true);
                         _controllerStrategie.clear();
                         _controllerAbbreviation.clear();
                       }

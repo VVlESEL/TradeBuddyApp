@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:trade_buddy/utils/filter_controller.dart';
+import 'package:trade_buddy/utils/settings_controller.dart';
 import 'package:trade_buddy/utils/trades_controller.dart';
 
 class FilterDialog extends StatefulWidget {
@@ -11,10 +11,9 @@ class _FilterDialogState extends State<FilterDialog>
     with SingleTickerProviderStateMixin {
   TabController tabController;
 
-  bool _isBuy = FilterController.filter["buy"];
-  bool _isSell = FilterController.filter["sell"];
-  Map _strategies = FilterController.filter["strategies"];
-  Map _symbols = FilterController.filter["symbols"];
+  Map _generalFilter = SettingsController.generalFilter;
+  Map _strategies = SettingsController.strategies;
+  Map _symbols = SettingsController.symbols;
 
   @override
   void dispose() {
@@ -40,23 +39,26 @@ class _FilterDialogState extends State<FilterDialog>
           Tab(icon: Icon(Icons.build)),
         ],
       ),
-      content: TabBarView(
-        controller: tabController,
-        children: <Widget>[
-          getGeneral(),
-          getSymbols(),
-          getStrategies(),
-        ],
+      content: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: TabBarView(
+          controller: tabController,
+          children: <Widget>[
+            getGeneral(),
+            getSymbols(),
+            getStrategies(),
+          ],
+        ),
       ),
       actions: <Widget>[
         FlatButton(
           child: Text("Apply"),
           onPressed: () async {
-            await FilterController.updateGeneral(buy: _isBuy, sell: _isSell);
-            await FilterController.updateSymbols(_symbols);
-            await FilterController.updateStrategies(_strategies);
-            await FilterController.updateFilter();
-            TradesController.initialize();
+            await SettingsController.updateGeneralFilter(_generalFilter);
+            await SettingsController.updateSymbols(_symbols);
+            await SettingsController.updateStrategies(_strategies);
+            TradesController.updateTrades();
             Navigator.pop(context);
           },
         ),
@@ -69,26 +71,24 @@ class _FilterDialogState extends State<FilterDialog>
   }
 
   Widget getGeneral() {
-    print(_isBuy);
-    print(_isSell);
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Card(
             elevation: 1.0,
-            color: _isBuy ? Theme.of(context).primaryColor : Colors.white,
+            color: _generalFilter["buy"] ? Theme.of(context).primaryColor : Colors.white,
             child: ListTile(
               title: Text("Buy Trades"),
-              onTap: () => setState(() => _isBuy = !_isBuy),
+              onTap: () => setState(() => _generalFilter["buy"] = !_generalFilter["buy"]),
             ),
           ),
           Card(
             elevation: 1.0,
-            color: _isSell ? Theme.of(context).primaryColor : Colors.white,
+            color: _generalFilter["sell"] ? Theme.of(context).primaryColor : Colors.white,
             child: ListTile(
               title: Text("Sell Trades"),
-              onTap: () => setState(() => _isSell = !_isSell),
+              onTap: () => setState(() => _generalFilter["sell"] = !_generalFilter["sell"]),
             ),
           ),
         ],
@@ -104,11 +104,11 @@ class _FilterDialogState extends State<FilterDialog>
           Card(
             elevation: 1.0,
             color:
-                _symbols["*"] ? Theme.of(context).primaryColor : Colors.white,
+                _symbols["*"]["filter"] ? Theme.of(context).primaryColor : Colors.white,
             child: ListTile(
               title: Text("*"),
               onTap: () {
-                setState(() => _symbols["*"] = !_symbols["*"]);
+                setState(() => _symbols["*"]["filter"] = !_symbols["*"]["filter"]);
               },
             ),
           )
@@ -120,13 +120,13 @@ class _FilterDialogState extends State<FilterDialog>
                     )
                   : Card(
                       elevation: 1.0,
-                      color: _symbols[symbol]
+                      color: _symbols[symbol]["filter"]
                           ? Theme.of(context).primaryColor
                           : Colors.white,
                       child: ListTile(
                         title: Text("$symbol"),
                         onTap: () {
-                          setState(() => _symbols[symbol] = !_symbols[symbol]);
+                          setState(() => _symbols[symbol]["filter"] = !_symbols[symbol]["filter"]);
                         },
                       ),
                     );
@@ -143,13 +143,13 @@ class _FilterDialogState extends State<FilterDialog>
         children: <Widget>[
           Card(
             elevation: 1.0,
-            color: _strategies["*"]
+            color: _strategies["*"]["filter"]
                 ? Theme.of(context).primaryColor
                 : Colors.white,
             child: ListTile(
               title: Text("*"),
               onTap: () {
-                setState(() => _strategies["*"] = !_strategies["*"]);
+                setState(() => _strategies["*"]["filter"] = !_strategies["*"]["filter"]);
               },
             ),
           )
@@ -162,14 +162,14 @@ class _FilterDialogState extends State<FilterDialog>
                         )
                       : Card(
                           elevation: 1.0,
-                          color: _strategies[strategy]
+                          color: _strategies[strategy]["filter"]
                               ? Theme.of(context).primaryColor
                               : Colors.white,
                           child: ListTile(
                             title: Text("$strategy"),
                             onTap: () {
-                              setState(() => _strategies[strategy] =
-                                  !_strategies[strategy]);
+                              setState(() => _strategies[strategy]["filter"] =
+                                  !_strategies[strategy]["filter"]);
                             },
                           ),
                         );

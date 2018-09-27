@@ -24,30 +24,37 @@ class _SymbolsDialogState extends State<SymbolsDialog> {
               builder: (BuildContext context, AsyncSnapshot<Map> snapshot) =>
                   Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: SettingsController.symbols.length == 0
+                      children: SettingsController.symbols.length <= 1
                           ? [
-                        Text("Register your first symbol for this account "
-                            "below. Provide the name in the text field "
-                            "exactly as it is written in the MT4.")
-                      ]
+                              Text(
+                                  "Register your first symbol for this account "
+                                  "below. Provide the name in the text field "
+                                  "exactly as it is written in the MT4.")
+                            ]
                           : snapshot.data?.keys?.map((symbol) {
-                        return Dismissible(
-                          key: Key(symbol),
-                          onDismissed: (direction) => SettingsController
-                              .removeSymbol(symbol),
-                          child: Card(
-                            elevation: 1.0,
-                            child: Row(
-                              children: <Widget>[
-                                Text(
-                                  "$symbol",
-                                  style: TextStyle(fontSize: 18.0),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      })?.toList()),
+                              return symbol == "*"
+                                  ? Container(
+                                      width: 0.0,
+                                      height: 0.0,
+                                    )
+                                  : Dismissible(
+                                      key: Key(symbol),
+                                      onDismissed: (direction) =>
+                                          SettingsController.removeSymbol(
+                                              symbol),
+                                      child: Card(
+                                        elevation: 1.0,
+                                        child: Row(
+                                          children: <Widget>[
+                                            Text(
+                                              "$symbol",
+                                              style: TextStyle(fontSize: 18.0),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                            })?.toList()),
             ),
             Form(
               key: _formKey,
@@ -70,9 +77,8 @@ class _SymbolsDialogState extends State<SymbolsDialog> {
                     child: Icon(Icons.add_circle_outline),
                     onPressed: () {
                       if (_formKey.currentState.validate()) {
-                        SettingsController.addSymbol({
-                          _controllerSymbol.text: "active"
-                        });
+                        SettingsController.addSymbol(
+                            _controllerSymbol.text, true);
                         _controllerSymbol.clear();
                       }
                     },

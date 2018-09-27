@@ -1,7 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:trade_buddy/utils/auth.dart';
-import 'package:trade_buddy/utils/filter_controller.dart';
 import 'dart:async';
 
 import 'package:trade_buddy/utils/trades_controller.dart';
@@ -27,6 +26,11 @@ class SettingsController {
   static final _accountsSubject = BehaviorSubject<Map>();
   static Map _accounts;
 
+  ///streams the general filter of the current account
+  static Stream<Map> get generalFilterStream => _generalFilterSubject.stream;
+  static final _generalFilterSubject = BehaviorSubject<Map>();
+  static Map _generalFilter;
+
   ///streams the strategies of the current account
   static Stream<Map> get strategiesStream => _strategiesSubject.stream;
   static final _strategiesSubject = BehaviorSubject<Map>();
@@ -39,21 +43,22 @@ class SettingsController {
 
   ///The function initializes the controller
   static Future<void> initialize() async {
-    _reference = FirebaseDatabase.instance
-        .reference()
-        .child("user/${Auth.user.uid}/settings");
+    _reference =
+        FirebaseDatabase.instance.reference().child("user/${Auth.user.uid}");
 
-    //add a listener for new child and child changes
-    _reference.onChildAdded.listen((event) => fetchSettingsFromDb(event.snapshot));
-    _reference.onChildChanged.listen((event) => fetchSettingsFromDb(event.snapshot));
+    //get current account
+    await setCurrentAccount(
+        (await _reference.child("settings/current_account").once()).value);
+
+    //add a listener for new child
+    _reference.onChildAdded
+        .listen((event) => fetchSettingsFromDb(event.snapshot));
   }
 
   static fetchSettingsFromDb(DataSnapshot snapshot) async {
     switch (snapshot.key) {
       case "accounts":
         accounts = snapshot.value;
-        await setCurrentAccount(
-            (await _reference.child("current_account").once()).value);
         if (currentAccount == null && accounts != null) {
           await setCurrentAccount(accounts.keys.first);
         }
@@ -64,7 +69,7 @@ class SettingsController {
   static Map get accounts => _accounts;
 
   static set accounts(Map value) {
-    print("accounts = $value");
+    print("accounts = ${value.keys}");
     if (accounts == value) return;
     _accounts = value;
     _accountsSubject.add(value);
@@ -77,7 +82,7 @@ class SettingsController {
     if (currentAccount == value) return;
     _currentAccount = value;
     _currentAccountSubject.add(value);
-    _reference.update({
+    _reference.child("settings").update({
       "current_account": value,
     });
     await fetchCurrentAccountData();
@@ -87,9 +92,10 @@ class SettingsController {
     var snapshot = await _reference.child("accounts/$currentAccount").once();
     if (snapshot.value == null) return;
     balance = snapshot.value["balance"];
+    generalFilter = snapshot.value["general_filter"];
     strategies = snapshot.value["strategies"];
     symbols = snapshot.value["symbols"];
-    await FilterController.initialize();
+//    await FilterController.initialize();
     await TradesController.initialize();
   }
 
@@ -105,6 +111,25 @@ class SettingsController {
     });
   }
 
+  static Map get generalFilter => _generalFilter;
+
+  static set generalFilter(Map value) {
+    print("generalFilter = $value");
+    if(generalFilter == value && value != null) return;
+    _generalFilter = value ?? Map();
+    _generalFilterSubject.add(_generalFilter);
+  }
+
+  static updateGeneralFilter(Map newGeneralFilter) async {
+    print("updateGeneralFilter = $newGeneralFilter");
+    generalFilter = newGeneralFilter;
+    generalFilter.forEach((k,v) async {
+      await _reference.child("accounts/$currentAccount/general_filter").update({
+        k: v,
+      });
+    });
+  }
+
   static Map get strategies => _strategies;
 
   static set strategies(Map value) {
@@ -114,20 +139,34 @@ class SettingsController {
     _strategiesSubject.add(_strategies);
   }
 
-  static addStrategiy(Map<String, dynamic> value) {
-    print("addStrategie = $value");
+  static addStrategy(String name, String abbreviation, bool filter) {
+    print("addStrategy = $name");
+    var value = {
+      name: {
+        "abbreviation": abbreviation,
+        "filter": filter,
+      }
+    };
     _strategies.addAll(value);
     _strategiesSubject.add(_strategies);
     _reference.child("accounts/$currentAccount/strategies").update(value);
-    FilterController.initialize();
   }
 
-  static removeStrategiy(String value) {
+  static updateStrategies(Map newStrategies) async {
+    print("updateStrategies = $newStrategies");
+    strategies = newStrategies;
+    strategies.forEach((k,v) async {
+      await _reference.child("accounts/$currentAccount/strategies").update({
+        k: v,
+      });
+    });
+  }
+
+  static removeStrategy(String value) {
     print("removeStrategie = $value");
     _strategies.remove(value);
     _strategiesSubject.add(_strategies);
     _reference.child("accounts/$currentAccount/strategies/$value").remove();
-    FilterController.initialize();
   }
 
   static Map get symbols => _symbols;
@@ -139,12 +178,26 @@ class SettingsController {
     _symbolsSubject.add(_symbols);
   }
 
-  static addSymbol(Map<String, dynamic> value) {
-    print("addSymbol = $value");
+  static addSymbol(String name, bool filter) {
+    print("addSymbol = $name");
+    var value = {
+      name: {
+        "filter": filter,
+      }
+    };
     _symbols.addAll(value);
     _symbolsSubject.add(_symbols);
     _reference.child("accounts/$currentAccount/symbols").update(value);
-    FilterController.initialize();
+  }
+
+  static updateSymbols(Map newSymbols) async {
+    print("updateSymbols = $newSymbols");
+    symbols = newSymbols;
+    symbols.forEach((k,v) async {
+      await _reference.child("accounts/$currentAccount/symbols").update({
+        k: v,
+      });
+    });
   }
 
   static removeSymbol(String value) {
@@ -152,6 +205,5 @@ class SettingsController {
     _symbols.remove(value);
     _symbolsSubject.add(_symbols);
     _reference.child("accounts/$currentAccount/symbols/$value").remove();
-    FilterController.initialize();
   }
 }
