@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
 import 'package:rxdart/rxdart.dart';
-import 'package:trade_buddy/utils/filter_controller.dart';
 import 'package:trade_buddy/utils/settings_controller.dart';
 import 'package:trade_buddy/utils/trade_model.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -25,9 +24,22 @@ class TradesController {
     var currentAccount = SettingsController.currentAccount;
     if (currentAccount == null) return;
 
+    //get strategies for the filter criteria
+    var strategiesList = [];
+    SettingsController.strategies.forEach((k, v) {
+      if (v["filter"]) strategiesList.add(v["abbreviation"] ?? k);
+    });
+
+    //get symbols for the filter criteria
+    var symbolsList = [];
+    SettingsController.symbols.forEach((k, v) {
+      if (v["filter"]) symbolsList.add(k);
+    });
+
+    //get a reference to the db
     reference = FirebaseDatabase.instance
         .reference()
-        .child("user/${Auth.user.uid}/trades/$currentAccount");
+        .child("user/${Auth.user.uid}/accounts/$currentAccount/trades");
 
     //reset trades list
     trades.clear();
@@ -35,10 +47,12 @@ class TradesController {
     //add a listener for new child and check if it meets the filter criteria
     reference.orderByChild("closetime").onChildAdded.listen((event) {
       _isLoadingSubject.add(true);
-      if (addTrade(Trade.fromJson(event.snapshot.key, event.snapshot.value))) {
-        trades.sort((Trade a, b) => a.closetime.compareTo(b.closetime));
+      if (addTrade(Trade.fromJson(event.snapshot.key, event.snapshot.value),
+          symbolsList, strategiesList)) {
+        trades.sort();
         _tradesSubject.add(UnmodifiableListView(trades.reversed));
       }
+      _tradesSubject.add(UnmodifiableListView(trades.reversed));
       _isLoadingSubject.add(false);
     });
 
@@ -51,6 +65,31 @@ class TradesController {
     });
   }
 
+  ///The function adds a single trade that meets the filter criteria to the list
+  static bool addTrade(Trade trade, List symbolsList, List strategiesList) {
+    //check general filter
+    if (SettingsController.generalFilter != null) {
+      if (!(SettingsController.generalFilter["sell"] ?? false) &&
+          trade.type == "sell") return false;
+      if (!(SettingsController.generalFilter["buy"] ?? false) &&
+          trade.type == "buy") return false;
+    }
+
+    //check symbols filter
+    if (!symbolsList.contains("*") && !symbolsList.contains(trade.symbol))
+      return false;
+
+    //check strategies filter
+    if (!strategiesList.contains("*") && !strategiesList.contains(trade.strategy))
+      return false;
+
+    //add trade to the list
+    if (!trades.contains(trade)) trades.add(trade);
+    return true;
+  }
+}
+
+/* not in use because it destoys the order of the trades when the closetime is equal
   ///The function updates all trades in the db
   static Future<void> updateTrades() async {
     _isLoadingSubject.add(true);
@@ -64,41 +103,8 @@ class TradesController {
     dbTrades.value.forEach((key, value) {
       addTrade(Trade.fromJson(key, value));
     });
+    trades.sort();
     _tradesSubject.add(UnmodifiableListView(trades.reversed));
     _isLoadingSubject.add(false);
   }
-
-  ///The function adds a single trade that meets the filter criteria to the list
-  static bool addTrade(Trade trade) {
-    //check if the trade meets the filter criteria
-    if (!checkFilter(trade)) return false;
-    //add trade to the list
-    if (!trades.contains(trade)) trades.add(trade);
-    return true;
-  }
-
-  ///The function checks if a trade meets the filter criteria
-  static bool checkFilter(Trade trade) {
-    if (SettingsController.generalFilter != null) {
-      if (!(SettingsController.generalFilter["sell"] ?? false) &&
-          trade.type == "sell") return false;
-      if (!(SettingsController.generalFilter["buy"] ?? false) &&
-          trade.type == "buy") return false;
-    }
-
-    if (SettingsController.symbols != null &&
-        SettingsController.symbols["*"] != null &&
-        !(SettingsController.symbols["*"]["filter"] ?? false) &&
-        (SettingsController.symbols[trade.symbol] == null ||
-        !(SettingsController.symbols[trade.symbol]["filter"] ?? false)))
-      return false;
-
-    if (SettingsController.strategies != null &&
-        SettingsController.strategies["*"] != null &&
-        !(SettingsController.strategies["*"]["filter"] ?? false) &&
-        (SettingsController.strategies[trade.strategy] == null ||
-        !(SettingsController.strategies[trade.strategy]["filter"] ?? false)))
-      return false;
-    return true;
-  }
-}
+*/

@@ -54,7 +54,13 @@ class SettingsController {
     _reference.child("accounts").onChildAdded
         .listen((event) async {
       accounts.add(event.snapshot.key);
-      if (currentAccount == null && accounts != null) {
+      if (currentAccount == null && accounts.length > 0) {
+        await setCurrentAccount(accounts.first);
+      }
+    });
+    _reference.child("accounts").onChildRemoved.listen((event) async {
+      accounts.remove(event.snapshot.key);
+      if (currentAccount == event.snapshot.key && accounts.length > 0) {
         await setCurrentAccount(accounts.first);
       }
     });

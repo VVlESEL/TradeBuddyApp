@@ -45,8 +45,7 @@ class Trade implements Comparable {
 
     this.reference = FirebaseDatabase.instance
         .reference()
-        .child("user/${Auth.user.uid}/trades/${SettingsController
-        .currentAccount}/$id");
+        .child("user/${Auth.user.uid}/accounts/${SettingsController.currentAccount}/trades/$id");
   }
 
   @override

@@ -58,7 +58,7 @@ class _FilterDialogState extends State<FilterDialog>
             await SettingsController.updateGeneralFilter(_generalFilter);
             await SettingsController.updateSymbols(_symbols);
             await SettingsController.updateStrategies(_strategies);
-            TradesController.updateTrades();
+            TradesController.initialize();
             Navigator.pop(context);
           },
         ),
